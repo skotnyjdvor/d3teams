@@ -230,15 +230,14 @@ function App() {
             >
               <I size={19} />
               <span>{t[k]}</span>
-              {k === "tasks" && <b>8</b>}
             </button>
           ))}
         </nav>
         <div className="teamCard">
-          <div className="teamBadge">D3</div>
+          <div className="teamBadge">{(session.team?.name || "T").slice(0,2).toUpperCase()}</div>
           <div>
-            <strong>D3 Karting</strong>
-            <small>{t.team} · 8 members</small>
+            <strong>{session.team?.name || (lang === "PL" ? "Twój zespół" : "Your team")}</strong>
+            <small>{t.team}</small>
           </div>
           <ChevronRight size={18} />
         </div>
@@ -309,7 +308,7 @@ function App() {
             <>
               <section className="welcome">
                 <div>
-                  <p className="eyebrow">TUESDAY, 14 JULY</p>
+                  <p className="eyebrow">D3TEAMS · RACE OPERATIONS</p>
                   <h1>{t.morning}</h1>
                   <p>{t.subtitle}</p>
                 </div>
@@ -319,82 +318,21 @@ function App() {
                 </button>
               </section>
               <section className="metrics">
-                <Metric label={t.next} value="4" suffix={t.days} accent />
-                <Metric
-                  label={t.readiness}
-                  value="82"
-                  suffix="%"
-                  progress={82}
-                />
-                <Metric
-                  label={t.openTasks}
-                  value="8"
-                  suffix="3 CRITICAL"
-                  warn
-                />
-                <Metric
-                  label={t.stockAlerts}
-                  value="6"
-                  suffix="2 OUT OF STOCK"
-                  warn
-                />
+                <Metric label={t.next} value="0" suffix={t.days} />
+                <Metric label={t.readiness} value="0" suffix="%" progress={0} />
+                <Metric label={t.openTasks} value="0" suffix="" />
+                <Metric label={t.stockAlerts} value="0" suffix="" />
               </section>
               <section className="grid">
                 <div className="column">
                   <Card title={t.nextEvent} action={t.viewCalendar}>
-                    <div className="event">
-                      <div className="dateTile">
-                        <b>18</b>
-                        <span>JUL</span>
-                      </div>
-                      <div className="eventInfo">
-                        <span className="live">CHAMPIONSHIP</span>
-                        <h2>{t.race}</h2>
-                        <p>
-                          <MapPin size={15} />
-                          {t.track}
-                        </p>
-                        <p>
-                          <CalendarDays size={15} />
-                          {t.date}
-                        </p>
-                      </div>
-                      <ChevronRight className="eventArrow" />
-                    </div>
+                    <EmptyOverview icon={CalendarDays} text={lang === "PL" ? "Brak nadchodzących wydarzeń" : "No upcoming events"} />
                   </Card>
                   <Card title={t.readinessTitle} action={t.viewChecklist}>
-                    <div className="readiness">
-                      <div className="ring" style={{ "--p": "82%" }}>
-                        <div>
-                          <b>82%</b>
-                          <span>READY</span>
-                        </div>
-                      </div>
-                      <div className="checks">
-                        <Status label="Karts" value="2 / 3" percent={67} />
-                        <Status label="Equipment" value="94%" percent={94} />
-                        <Status label="Documents" value="100%" percent={100} />
-                      </div>
-                    </div>
+                    <EmptyOverview icon={ClipboardCheck} text={lang === "PL" ? "Brak danych gotowości" : "No readiness data"} />
                   </Card>
                   <Card title={t.mechanic} action={t.tasks}>
-                    <div className="taskList">
-                      <Task
-                        title={t.engine}
-                        meta={t.assigned}
-                        tag={t.critical}
-                      />
-                      <Task
-                        title={t.alignment}
-                        meta="Due today · 16:00"
-                        tag={t.today}
-                      />
-                      <Task
-                        title={t.tyres}
-                        meta="Due 17 July"
-                        tag={t.thisWeek}
-                      />
-                    </div>
+                    <EmptyOverview icon={ClipboardCheck} text={lang === "PL" ? "Brak zadań mechaników" : "No mechanic tasks"} />
                   </Card>
                 </div>
                 <div className="column">
@@ -407,15 +345,13 @@ function App() {
                       <Location
                         icon={Warehouse}
                         name={t.base}
-                        count="286"
+                        count="0"
                         t={t}
                       />
-                      <Location icon={Truck} name={t.truck} count="94" t={t} />
+                      <Location icon={Truck} name={t.truck} count="0" t={t} />
                     </div>
                     <div className="stock">
-                      <Stock name={t.brake} count="0" />
-                      <Stock name={t.chain} count="3" />
-                      <Stock name={t.oil} count="4" />
+                      <EmptyOverview icon={Boxes} text={lang === "PL" ? "Magazyn jest pusty" : "Inventory is empty"} />
                     </div>
                   </Card>
                   <Card title={t.quick}>
@@ -441,15 +377,7 @@ function App() {
                     </div>
                   </Card>
                   <Card title={t.activity} action={t.allActivity}>
-                    <div className="activities">
-                      <Activity
-                        icon={ClipboardCheck}
-                        text={t.completed}
-                        time="12 min"
-                      />
-                      <Activity icon={Truck} text={t.moved} time="46 min" />
-                      <Activity icon={Radio} text={t.uploaded} time="1 h" />
-                    </div>
+                    <EmptyOverview icon={History} text={lang === "PL" ? "Brak ostatniej aktywności" : "No recent activity"} />
                   </Card>
                 </div>
               </section>
@@ -3079,5 +3007,8 @@ function Activity({ icon: I, text, time }) {
       </p>
     </div>
   );
+}
+function EmptyOverview({icon:I,text}){
+  return <div className="emptyOverview"><I/><span>{text}</span></div>;
 }
 createRoot(document.getElementById("root")).render(<App />);

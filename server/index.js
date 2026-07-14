@@ -89,7 +89,7 @@ app.post('/api/auth/register',(req,res)=>{
   return res.status(500).json({error:'Could not create the team account',code:'REGISTRATION_FAILED'});
  }
 });
-app.post('/api/auth/login',(req,res)=>{const user=db.prepare('SELECT * FROM users WHERE lower(email)=lower(?)').get(req.body.email||'');if(!user||!user.active||!bcrypt.compareSync(req.body.password||'',user.password_hash))return res.status(401).json({error:'Invalid email or password'});const profile={id:user.id,teamId:user.team_id,name:user.name,email:user.email,role:user.role};res.json({token:jwt.sign(profile,secret,{expiresIn:'7d'}),user:profile})});
+app.post('/api/auth/login',(req,res)=>{const user=db.prepare('SELECT u.*,t.name team_name,t.slug team_slug FROM users u JOIN teams t ON t.id=u.team_id WHERE lower(u.email)=lower(?)').get(req.body.email||'');if(!user||!user.active||!bcrypt.compareSync(req.body.password||'',user.password_hash))return res.status(401).json({error:'Invalid email or password'});const profile={id:user.id,teamId:user.team_id,name:user.name,email:user.email,role:user.role};res.json({token:jwt.sign(profile,secret,{expiresIn:'7d'}),user:profile,team:{id:user.team_id,name:user.team_name,slug:user.team_slug}})});
 app.get('/api/auth/me',auth,(req,res)=>res.json({user:req.user}));
 const publicUser=u=>({id:u.id,name:u.name,email:u.email,role:u.role,active:!!u.active});
 app.get('/api/team/users',auth,(req,res)=>res.json({users:db.prepare('SELECT id,name,email,role,active FROM users WHERE team_id=? ORDER BY role,name').all(req.user.teamId).map(publicUser)}));
