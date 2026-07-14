@@ -1511,7 +1511,11 @@ header {
   color: #fff;
   padding: 0 13px;
   outline: 0;
+  font: 500 14px/1.4 Inter, Arial, sans-serif;
+  letter-spacing: 0;
+  text-transform: none;
 }
+.loginPanel input::placeholder{color:#65656b;font-weight:400}
 .loginPanel input:focus {
   border-color: var(--orange);
 }
