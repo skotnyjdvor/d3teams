@@ -1,0 +1,2669 @@
+@import url("https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap");
+:root {
+  font-family: Inter, Arial, sans-serif;
+  color: #f2f2f2;
+  background: #0a0a0b;
+  font-synthesis: none;
+  --orange: #ff5a16;
+  --panel: #131315;
+  --panel2: #18181b;
+  --line: #29292d;
+  --muted: #8c8c94;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: #0a0a0b;
+}
+button,
+input {
+  font: inherit;
+}
+.app {
+  min-height: 100vh;
+}
+.sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: 248px;
+  background: #0e0e10;
+  border-right: 1px solid var(--line);
+  padding: 24px 16px 18px;
+  display: flex;
+  flex-direction: column;
+  z-index: 20;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.logoMark {
+  font: 800 23px/1 "Barlow Condensed";
+  font-style: italic;
+  background: var(--orange);
+  color: #090909;
+  padding: 7px 6px;
+  clip-path: polygon(8% 0, 100% 0, 92% 100%, 0 100%);
+}
+.logo strong {
+  display: block;
+  font: 800 20px/18px "Barlow Condensed";
+  letter-spacing: 1.2px;
+}
+.logo small {
+  font-size: 8px;
+  letter-spacing: 1.8px;
+  color: #777;
+}
+.navLabel {
+  font-size: 10px;
+  letter-spacing: 1.4px;
+  color: #666;
+  margin: 40px 12px 10px;
+  text-transform: uppercase;
+}
+.sidebar nav {
+  display: grid;
+  gap: 5px;
+}
+.sidebar nav button {
+  border: 0;
+  background: transparent;
+  color: #909096;
+  height: 43px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  border-radius: 6px;
+  padding: 0 12px;
+  cursor: pointer;
+  text-align: left;
+}
+.sidebar nav button:hover,
+.sidebar nav button.active {
+  background: #201712;
+  color: #fff;
+}
+.sidebar nav button.active {
+  box-shadow: inset 3px 0 var(--orange);
+}
+.sidebar nav button.active svg {
+  color: var(--orange);
+}
+.sidebar nav button b {
+  margin-left: auto;
+  background: var(--orange);
+  color: #111;
+  border-radius: 10px;
+  font-size: 10px;
+  padding: 2px 6px;
+}
+.teamCard {
+  margin-top: auto;
+  background: #171719;
+  border: 1px solid var(--line);
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.teamBadge,
+.avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 4px;
+  display: grid;
+  place-items: center;
+  background: #28282c;
+  font: 700 14px "Barlow Condensed";
+}
+.teamCard div:nth-child(2),
+.user div:nth-child(2) {
+  min-width: 0;
+  flex: 1;
+}
+.teamCard strong,
+.user strong {
+  font-size: 12px;
+  display: block;
+}
+.teamCard small,
+.user small {
+  font-size: 9px;
+  color: #777;
+  display: block;
+  margin-top: 3px;
+}
+.user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+  padding: 10px 6px;
+}
+.avatar {
+  border-radius: 50%;
+  background: var(--orange);
+  color: #111;
+}
+.user button {
+  background: none;
+  color: #888;
+  border: 0;
+}
+.sideTop .close {
+  display: none;
+}
+main {
+  margin-left: 248px;
+  min-height: 100vh;
+}
+header {
+  height: 70px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  padding: 0 32px;
+  position: sticky;
+  top: 0;
+  background: rgba(10, 10, 11, 0.93);
+  backdrop-filter: blur(12px);
+  z-index: 10;
+}
+.search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 330px;
+  color: #777;
+}
+.search input {
+  background: transparent;
+  border: 0;
+  outline: 0;
+  color: #ddd;
+  width: 100%;
+}
+.search kbd {
+  font-size: 10px;
+  border: 1px solid #333;
+  padding: 4px 7px;
+  border-radius: 4px;
+}
+.headerActions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.lang {
+  display: flex;
+  border: 1px solid #303034;
+  border-radius: 4px;
+  padding: 2px;
+}
+.lang button {
+  border: 0;
+  background: none;
+  color: #777;
+  padding: 5px 8px;
+  font-size: 10px;
+  cursor: pointer;
+}
+.lang .selected {
+  background: #29292d;
+  color: #fff;
+}
+.iconBtn,
+.mobileUser,
+.menuBtn {
+  position: relative;
+  background: none;
+  border: 0;
+  color: #aaa;
+  cursor: pointer;
+}
+.iconBtn i {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--orange);
+  right: 4px;
+  top: 1px;
+}
+.mobileUser,
+.mobileLogo,
+.menuBtn {
+  display: none;
+}
+.content {
+  max-width: 1430px;
+  margin: auto;
+  padding: 32px;
+}
+.welcome {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  margin-bottom: 26px;
+}
+.eyebrow {
+  font: 600 11px "Barlow Condensed";
+  letter-spacing: 1.7px;
+  color: var(--orange) !important;
+}
+.welcome h1 {
+  font: 700 34px/1.1 "Barlow Condensed";
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 7px 0;
+}
+.welcome p {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 0;
+}
+.primary {
+  height: 40px;
+  padding: 0 16px;
+  border: 0;
+  background: var(--orange);
+  color: #0b0b0b;
+  font-weight: 700;
+  text-transform: uppercase;
+  font: 700 12px "Barlow Condensed";
+  letter-spacing: 0.6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border: 1px solid var(--line);
+  margin-bottom: 20px;
+}
+.metric {
+  padding: 19px 22px;
+  background: #121214;
+  min-height: 98px;
+  border-right: 1px solid var(--line);
+  position: relative;
+}
+.metric:last-child {
+  border: 0;
+}
+.metric > span {
+  font: 600 10px "Barlow Condensed";
+  letter-spacing: 1.2px;
+  color: #777;
+}
+.metric > div:not(.bar) {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 8px;
+}
+.metric b {
+  font: 700 32px/1 "Barlow Condensed";
+}
+.metric small {
+  font: 600 9px "Barlow Condensed";
+  letter-spacing: 1px;
+  color: #777;
+}
+.metric .warn {
+  color: #f45f42;
+}
+.metricAccent {
+  background: linear-gradient(115deg, #22150f, #151313);
+  box-shadow: inset 3px 0 var(--orange);
+}
+.metricAccent b {
+  color: var(--orange);
+}
+.bar {
+  height: 3px;
+  background: #29292d;
+  margin-top: 10px;
+}
+.bar i {
+  display: block;
+  height: 100%;
+  background: var(--orange);
+}
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(330px, 1fr);
+  gap: 20px;
+}
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+}
+.cardHead {
+  height: 50px;
+  padding: 0 18px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+}
+.cardHead h3 {
+  margin: 0;
+  font: 700 14px "Barlow Condensed";
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+.cardHead button {
+  margin-left: auto;
+  background: none;
+  border: 0;
+  color: #888;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  cursor: pointer;
+}
+.event {
+  padding: 18px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.dateTile {
+  width: 66px;
+  height: 72px;
+  border: 1px solid #3a2c25;
+  background: #1c1613;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  flex: 0 0 auto;
+}
+.dateTile b {
+  font: 700 30px/26px "Barlow Condensed";
+  color: var(--orange);
+}
+.dateTile span {
+  font: 700 10px "Barlow Condensed";
+  letter-spacing: 2px;
+}
+.eventInfo {
+  min-width: 0;
+}
+.eventInfo .live {
+  font: 700 8px "Barlow Condensed";
+  letter-spacing: 1.4px;
+  color: var(--orange);
+}
+.eventInfo h2 {
+  font: 700 18px "Barlow Condensed";
+  text-transform: uppercase;
+  margin: 5px 0 8px;
+}
+.eventInfo p {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #888;
+  font-size: 10px;
+  margin: 0 16px 0 0;
+}
+.eventArrow {
+  margin-left: auto;
+  color: #666;
+}
+.readiness {
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 35px;
+}
+.ring {
+  width: 108px;
+  height: 108px;
+  border-radius: 50%;
+  background: conic-gradient(var(--orange) var(--p), #2a2a2d 0);
+  display: grid;
+  place-items: center;
+  position: relative;
+  flex: none;
+}
+.ring:before {
+  content: "";
+  position: absolute;
+  inset: 9px;
+  background: var(--panel);
+  border-radius: 50%;
+}
+.ring div {
+  z-index: 1;
+  text-align: center;
+}
+.ring b {
+  font: 700 27px "Barlow Condensed";
+  display: block;
+}
+.ring span {
+  font: 600 8px "Barlow Condensed";
+  letter-spacing: 1.4px;
+  color: #777;
+}
+.checks {
+  flex: 1;
+  display: grid;
+  gap: 14px;
+}
+.status > div:first-child {
+  display: flex;
+  justify-content: space-between;
+}
+.status span,
+.status b {
+  font-size: 10px;
+}
+.status span {
+  color: #aaa;
+}
+.task {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 58px;
+  padding: 10px 17px;
+  border-bottom: 1px solid #242427;
+}
+.task:last-child {
+  border: 0;
+}
+.check {
+  width: 18px;
+  height: 18px;
+  border: 1px solid #4a4a50;
+  background: transparent;
+  border-radius: 2px;
+}
+.task > div {
+  display: grid;
+  gap: 4px;
+  flex: 1;
+}
+.task strong {
+  font-size: 11px;
+}
+.task small {
+  font-size: 9px;
+  color: #777;
+}
+.task > span {
+  font: 600 8px "Barlow Condensed";
+  letter-spacing: 1px;
+  color: #ff7155;
+  background: #321a16;
+  padding: 4px 7px;
+}
+.task > svg {
+  color: #666;
+}
+.locations {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 14px;
+}
+.location {
+  background: #1a1a1d;
+  padding: 14px;
+  display: flex;
+  gap: 13px;
+  align-items: center;
+}
+.location svg {
+  color: var(--orange);
+}
+.location b {
+  display: block;
+  font: 700 23px "Barlow Condensed";
+}
+.location span {
+  color: #777;
+  font-size: 9px;
+}
+.stock {
+  border-top: 1px solid var(--line);
+  padding: 6px 16px;
+}
+.stock > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #232326;
+  font-size: 10px;
+}
+.stock > div:last-child {
+  border: 0;
+}
+.stock b {
+  color: #ff6847;
+}
+.stock small {
+  font: 600 7px "Barlow Condensed";
+  color: #777;
+  margin-left: 3px;
+}
+.quick {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  padding: 14px;
+  gap: 8px;
+}
+.quick button {
+  border: 1px solid #29292d;
+  background: #19191c;
+  color: #aaa;
+  min-height: 88px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  font-size: 9px;
+  cursor: pointer;
+}
+.quick button:hover {
+  border-color: #55301e;
+  color: #fff;
+}
+.quick span {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  background: #292018;
+  color: var(--orange);
+}
+.quick svg {
+  width: 16px;
+}
+.activities {
+  padding: 5px 16px;
+}
+.activities > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid #252528;
+}
+.activities > div:last-child {
+  border: 0;
+}
+.activityIcon {
+  width: 28px;
+  height: 28px;
+  background: #242427;
+  display: grid;
+  place-items: center;
+  color: #aaa;
+}
+.activityIcon svg {
+  width: 13px;
+}
+.activities p {
+  font-size: 9px;
+  margin: 0;
+  display: grid;
+  gap: 4px;
+}
+.activities small {
+  color: #666;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.activities small svg {
+  width: 9px;
+  height: 9px;
+}
+.mobileNav {
+  display: none;
+}
+.scrim {
+  display: none;
+}
+@media (max-width: 1000px) {
+  .sidebar {
+    transform: translateX(-100%);
+    transition: 0.25s;
+  }
+  .sidebar.open {
+    transform: none;
+  }
+  .sideTop {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .sideTop .close {
+    display: block;
+    border: 0;
+    background: none;
+    color: #aaa;
+  }
+  .scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: #000a;
+    z-index: 15;
+  }
+  main {
+    margin-left: 0;
+  }
+  .menuBtn,
+  .mobileLogo {
+    display: block;
+  }
+  .mobileLogo {
+    margin-left: 15px;
+  }
+  .mobileLogo .logo small {
+    display: none;
+  }
+  .search {
+    margin-left: 28px;
+  }
+  .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 720px) {
+  header {
+    height: 60px;
+    padding: 0 15px;
+  }
+  .mobileLogo .logoMark {
+    font-size: 17px;
+  }
+  .mobileLogo .logo strong {
+    font-size: 17px;
+  }
+  .search {
+    display: none;
+  }
+  .mobileUser {
+    display: block;
+  }
+  .headerActions {
+    gap: 8px;
+  }
+  .content {
+    padding: 20px 14px 90px;
+  }
+  .welcome {
+    align-items: start;
+  }
+  .welcome h1 {
+    font-size: 27px;
+  }
+  .welcome p {
+    font-size: 11px;
+  }
+  .welcome .primary {
+    width: 38px;
+    padding: 0;
+    justify-content: center;
+    font-size: 0;
+  }
+  .metrics {
+    grid-template-columns: 1fr 1fr;
+  }
+  .metric:nth-child(2) {
+    border-right: 0;
+  }
+  .metric:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--line);
+  }
+  .metric {
+    padding: 15px;
+    min-height: 84px;
+  }
+  .metric b {
+    font-size: 27px;
+  }
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  .event {
+    align-items: flex-start;
+  }
+  .eventInfo p {
+    display: flex;
+    margin-top: 5px;
+  }
+  .eventArrow {
+    display: none;
+  }
+  .readiness {
+    gap: 22px;
+  }
+  .locations {
+    padding: 10px;
+  }
+  .quick {
+    padding: 10px;
+  }
+  .mobileNav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 65px;
+    background: #111113;
+    border-top: 1px solid #2c2c30;
+    display: flex;
+    z-index: 12;
+  }
+  .mobileNav button {
+    flex: 1;
+    border: 0;
+    background: none;
+    color: #6e6e74;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    font-size: 8px;
+  }
+  .mobileNav button svg {
+    width: 18px;
+  }
+  .mobileNav button.active {
+    color: var(--orange);
+  }
+  .cardHead button {
+    font-size: 0;
+  }
+  .cardHead button svg {
+    width: 17px;
+  }
+  .sidebar {
+    width: 280px;
+  }
+}
+@media (max-width: 380px) {
+  .lang {
+    display: none;
+  }
+  .readiness {
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .ring {
+    width: 92px;
+    height: 92px;
+  }
+  .event {
+    gap: 12px;
+  }
+  .dateTile {
+    width: 56px;
+  }
+  .metric small {
+    font-size: 7px;
+  }
+}
+
+/* Inventory */
+.pageTitle {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.pageTitle h1 {
+  font: 700 34px/1 "Barlow Condensed";
+  text-transform: uppercase;
+  margin: 7px 0;
+}
+.pageTitle p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+.titleActions {
+  display: flex;
+  gap: 8px;
+}
+.titleActions svg,
+.primary svg,
+.secondary svg {
+  width: 16px;
+}
+.secondary {
+  height: 40px;
+  padding: 0 15px;
+  border: 1px solid #36363a;
+  background: #171719;
+  color: #ddd;
+  font: 700 11px "Barlow Condensed";
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+.inventoryStats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border: 1px solid var(--line);
+  background: #121214;
+  margin-bottom: 16px;
+}
+.inventoryStats > div {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 20px;
+  border-right: 1px solid var(--line);
+}
+.inventoryStats > div:last-child {
+  border: 0;
+}
+.inventoryStats > div > span {
+  width: 38px;
+  height: 38px;
+  background: #242427;
+  color: var(--orange);
+  display: grid;
+  place-items: center;
+}
+.inventoryStats svg {
+  width: 18px;
+}
+.inventoryStats p {
+  margin: 0;
+}
+.inventoryStats b {
+  font: 700 26px "Barlow Condensed";
+  display: block;
+}
+.inventoryStats small {
+  color: #777;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+.inventoryStats .alertStat span {
+  background: #2a1713;
+  color: #ff6747;
+}
+.inventoryStats .alertStat b {
+  color: #ff6747;
+}
+.inventoryTools {
+  background: #151517;
+  border: 1px solid var(--line);
+  border-bottom: 0;
+  display: flex;
+  align-items: center;
+  padding: 12px 14px;
+  gap: 20px;
+}
+.inventorySearch {
+  height: 38px;
+  min-width: 280px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #0e0e10;
+  border: 1px solid #303034;
+  padding: 0 11px;
+  color: #777;
+}
+.inventorySearch svg {
+  width: 16px;
+}
+.inventorySearch input {
+  border: 0;
+  background: none;
+  outline: 0;
+  color: #ddd;
+  width: 100%;
+  font-size: 11px;
+}
+.filters {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.filters > svg {
+  width: 16px;
+  color: #666;
+  margin-right: 7px;
+}
+.filters button {
+  height: 32px;
+  border: 0;
+  background: transparent;
+  color: #888;
+  padding: 0 10px;
+  font-size: 9px;
+  cursor: pointer;
+}
+.filters button b {
+  margin-left: 7px;
+  background: #29292d;
+  padding: 2px 5px;
+  border-radius: 8px;
+  font-size: 8px;
+}
+.filters button.selected {
+  color: #fff;
+  background: #292018;
+}
+.filters button.selected b {
+  color: var(--orange);
+}
+.partsTable {
+  border: 1px solid var(--line);
+  background: #121214;
+  overflow: hidden;
+}
+.tableHead,
+.partRow {
+  display: grid;
+  grid-template-columns: minmax(
+      230px,
+      2fr
+    ) 0.8fr 0.58fr 0.58fr 0.48fr 0.75fr 96px;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px;
+}
+.tableHead {
+  height: 38px;
+  background: #0e0e10;
+  color: #626268;
+  font: 600 8px "Barlow Condensed";
+  letter-spacing: 1px;
+}
+.partRow {
+  min-height: 64px;
+  border-top: 1px solid #252528;
+  font-size: 9px;
+}
+.partRow:hover {
+  background: #171719;
+}
+.partName {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+}
+.partIcon {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  background: #242427;
+  color: #888;
+  flex: none;
+}
+.partIcon svg {
+  width: 15px;
+}
+.partName p {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  min-width: 0;
+}
+.partName strong {
+  font-size: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.partName small {
+  font: 600 8px "Barlow Condensed";
+  color: #666;
+  letter-spacing: 0.7px;
+}
+.categoryTag {
+  color: #aaa;
+}
+.partRow > span b {
+  font-size: 11px;
+}
+.totalCell b {
+  font: 700 16px "Barlow Condensed" !important;
+}
+.stockState {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 8px;
+}
+.stockState i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #63b984;
+  box-shadow: 0 0 7px #63b98455;
+}
+.stockState.low {
+  color: #f5a33e;
+}
+.stockState.low i {
+  background: #f5a33e;
+}
+.stockState.out {
+  color: #ff6044;
+}
+.stockState.out i {
+  background: #ff6044;
+}
+.rowActions {
+  display: flex;
+  gap: 3px;
+}
+.rowActions button {
+  width: 28px;
+  height: 28px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #777;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.rowActions button:hover {
+  border-color: #3a3a3e;
+  background: #222225;
+  color: #fff;
+}
+.rowActions button.dangerIcon:hover {
+  color: #ff6044;
+  border-color: #5b2b23;
+}
+.rowActions svg {
+  width: 14px;
+}
+.empty {
+  text-align: center;
+  padding: 40px;
+  color: #777;
+  font-size: 11px;
+}
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  background: #000b;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+}
+.modal {
+  width: min(520px, 100%);
+  background: #151517;
+  border: 1px solid #35353a;
+  box-shadow: 0 20px 70px #000;
+}
+.modalHead {
+  height: 58px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+}
+.modalHead h2 {
+  font: 700 17px "Barlow Condensed";
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+}
+.modalHead button {
+  margin-left: auto;
+  background: none;
+  border: 0;
+  color: #888;
+}
+.modalHead svg {
+  width: 19px;
+}
+.form {
+  padding: 20px;
+  display: grid;
+  gap: 16px;
+}
+.form > div {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.form label {
+  display: grid;
+  gap: 7px;
+  color: #888;
+  font: 600 9px "Barlow Condensed";
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+.form input,
+.form select {
+  height: 40px;
+  border: 1px solid #333338;
+  background: #0e0e10;
+  color: #eee;
+  padding: 0 10px;
+  outline: none;
+}
+.form input:disabled {
+  color: #666;
+}
+.form input:focus,
+.form select:focus {
+  border-color: var(--orange);
+}
+.modalActions {
+  border-top: 1px solid var(--line);
+  padding: 14px 20px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.modalActions .primary,
+.dangerButton {
+  height: 40px;
+  border: 0;
+  padding: 0 16px;
+}
+.modalActions .secondary {
+  justify-content: center;
+}
+.modalActions button {
+  min-width: 90px;
+}
+.dangerButton {
+  background: #e84d32;
+  color: #fff;
+  font: 700 11px "Barlow Condensed";
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.deleteModal {
+  width: min(420px, 100%);
+}
+.deleteContent {
+  padding: 24px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.deleteContent > span {
+  width: 46px;
+  height: 46px;
+  background: #301915;
+  color: #ff6044;
+  display: grid;
+  place-items: center;
+}
+.deleteContent svg {
+  width: 20px;
+}
+.deleteContent p {
+  display: grid;
+  gap: 5px;
+  margin: 0;
+  color: #888;
+  font-size: 11px;
+}
+.deleteContent strong {
+  color: #fff;
+  font-size: 12px;
+}
+.historyCard {
+  background: #131315;
+  border: 1px solid var(--line);
+  margin-top: 16px;
+}
+.historyCard .cardHead h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.historyCard .cardHead svg {
+  width: 15px;
+  color: var(--orange);
+}
+.historyRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 18px;
+  border-top: 1px solid #242427;
+}
+.historyRow > span {
+  width: 6px;
+  height: 6px;
+  background: var(--orange);
+  border-radius: 50%;
+}
+.historyRow p {
+  margin: 0;
+  display: grid;
+  gap: 4px;
+  font-size: 9px;
+}
+.historyRow small {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #666;
+}
+.historyRow small svg {
+  width: 9px;
+}
+.mobileNav button {
+  cursor: pointer;
+}
+@media (max-width: 850px) {
+  .tableHead {
+    display: none;
+  }
+  .partRow {
+    grid-template-columns: minmax(190px, 1.5fr) 0.7fr 0.7fr 0.7fr 1fr 92px;
+  }
+  .partRow > .categoryTag {
+    display: none;
+  }
+  .inventoryTools {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .filters {
+    margin: 0;
+  }
+  .inventorySearch {
+    min-width: 0;
+  }
+}
+@media (max-width: 720px) {
+  .pageTitle {
+    align-items: flex-start;
+  }
+  .pageTitle h1 {
+    font-size: 27px;
+  }
+  .pageTitle .primary,
+  .pageTitle .secondary {
+    width: 40px;
+    padding: 0;
+    justify-content: center;
+    font-size: 0;
+  }
+  .inventoryStats > div {
+    padding: 12px;
+    gap: 9px;
+  }
+  .inventoryStats > div > span {
+    width: 30px;
+    height: 30px;
+  }
+  .inventoryStats b {
+    font-size: 21px;
+  }
+  .inventoryStats small {
+    font-size: 7px;
+  }
+  .filters {
+    overflow-x: auto;
+  }
+  .filters > svg {
+    display: none;
+  }
+  .filters button {
+    white-space: nowrap;
+  }
+  .partRow {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    padding: 13px 12px;
+    gap: 10px 8px;
+  }
+  .partName {
+    grid-column: 1/4;
+  }
+  .partRow > span[data-label] {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .partRow > span[data-label]:before {
+    content: attr(data-label);
+    color: #666;
+    font: 600 7px "Barlow Condensed";
+    letter-spacing: 0.8px;
+  }
+  .stockState {
+    grid-column: 1/2;
+  }
+  .partRow > .rowActions {
+    grid-column: 2/4;
+    grid-row: 3;
+    justify-self: end;
+  }
+  .inventoryTools {
+    padding: 10px;
+  }
+  .modalBackdrop {
+    align-items: end;
+    padding: 0;
+  }
+  .modal {
+    width: 100%;
+    border-bottom: 0;
+    max-height: 92vh;
+    overflow: auto;
+  }
+  .inventoryPage {
+    padding-bottom: 4px;
+  }
+  .form > div {
+    gap: 8px;
+  }
+  .historyRow {
+    padding: 10px 12px;
+  }
+}
+
+/* Authentication */
+.loginPage {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  background: #0b0b0c;
+}
+.loginVisual {
+  min-height: 100vh;
+  padding: 42px 52px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background:
+    radial-gradient(circle at 75% 25%, #4a1a091f, transparent 33%),
+    linear-gradient(135deg, #111113, #090909);
+  border-right: 1px solid #29292d;
+  position: relative;
+  overflow: hidden;
+}
+.loginVisual:after {
+  content: "03";
+  position: absolute;
+  right: -20px;
+  bottom: -100px;
+  font: 800 420px/1 "Barlow Condensed";
+  font-style: italic;
+  color: #ffffff05;
+}
+.loginVisual > div:nth-child(2) {
+  position: relative;
+  z-index: 1;
+}
+.loginVisual > div:nth-child(2) > span {
+  color: var(--orange);
+  font: 600 11px "Barlow Condensed";
+  letter-spacing: 2.5px;
+}
+.loginVisual h1 {
+  font: 800 clamp(70px, 8vw, 130px)/0.78 "Barlow Condensed";
+  font-style: italic;
+  letter-spacing: -3px;
+  margin: 22px 0;
+  text-transform: uppercase;
+}
+.loginVisual h1 em {
+  color: var(--orange);
+  font-style: italic;
+}
+.loginVisual p {
+  color: #777;
+  max-width: 440px;
+  font-size: 13px;
+  line-height: 1.7;
+}
+.loginVisual > small {
+  color: #444;
+  font: 600 9px "Barlow Condensed";
+  letter-spacing: 1.5px;
+}
+.loginPanel {
+  display: grid;
+  place-items: center;
+  position: relative;
+  padding: 30px;
+}
+.loginLang {
+  position: absolute;
+  right: 30px;
+  top: 28px;
+  display: flex;
+  border: 1px solid #303034;
+  padding: 2px;
+}
+.loginLang button {
+  background: none;
+  border: 0;
+  color: #777;
+  font-size: 9px;
+  padding: 5px 8px;
+}
+.loginLang .selected {
+  background: #29292d;
+  color: #fff;
+}
+.loginPanel form {
+  width: min(360px, 100%);
+}
+.loginPanel form h2 {
+  font: 700 36px "Barlow Condensed";
+  text-transform: uppercase;
+  margin: 8px 0;
+}
+.loginPanel form > p:not(.eyebrow) {
+  color: #777;
+  font-size: 11px;
+  margin: 0 0 30px;
+}
+.loginPanel label {
+  display: grid;
+  gap: 8px;
+  color: #888;
+  font: 600 9px "Barlow Condensed";
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin: 15px 0;
+}
+.loginPanel input {
+  height: 46px;
+  background: #111113;
+  border: 1px solid #303034;
+  color: #fff;
+  padding: 0 13px;
+  outline: 0;
+}
+.loginPanel input:focus {
+  border-color: var(--orange);
+}
+.loginSubmit {
+  height: 46px;
+  width: 100%;
+  border: 0;
+  background: var(--orange);
+  color: #111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font: 700 12px "Barlow Condensed";
+  text-transform: uppercase;
+  margin-top: 24px;
+  cursor: pointer;
+}
+.loginSubmit svg {
+  width: 16px;
+}
+.loginPanel form > small {
+  display: block;
+  text-align: center;
+  color: #555;
+  font-size: 8px;
+  margin-top: 14px;
+}
+.loginError,
+.apiError {
+  background: #321713;
+  border: 1px solid #612b22;
+  color: #ff755a;
+  padding: 11px 13px;
+  font-size: 10px;
+}
+.apiError {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  cursor: pointer;
+}
+.apiError svg {
+  width: 15px;
+}
+.apiError svg:last-child {
+  margin-left: auto;
+}
+.user button {
+  cursor: pointer;
+}
+.user small {
+  text-transform: capitalize;
+}
+@media (max-width: 760px) {
+  .loginPage {
+    grid-template-columns: 1fr;
+  }
+  .loginVisual {
+    display: none;
+  }
+  .loginPanel {
+    min-height: 100vh;
+    padding: 24px;
+  }
+  .loginPanel form h2 {
+    font-size: 32px;
+  }
+}
+
+/* Team management */
+.teamStats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border: 1px solid var(--line);
+  background: #121214;
+  margin-bottom: 16px;
+}
+.teamStats > div {
+  padding: 17px 20px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  border-right: 1px solid var(--line);
+}
+.teamStats > div:last-child {
+  border: 0;
+}
+.teamStats > div > span {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  background: #242427;
+  color: var(--orange);
+}
+.teamStats svg {
+  width: 18px;
+}
+.teamStats p {
+  margin: 0;
+}
+.teamStats b {
+  display: block;
+  font: 700 26px "Barlow Condensed";
+}
+.teamStats small {
+  display: block;
+  color: #777;
+  text-transform: uppercase;
+  font: 600 8px "Barlow Condensed";
+  letter-spacing: 1px;
+}
+.memberTools {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: #151517;
+  border: 1px solid var(--line);
+  padding: 12px 14px;
+  margin-bottom: 14px;
+}
+.memberTools .filters {
+  margin-left: auto;
+}
+.memberGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.memberCard {
+  min-height: 128px;
+  background: #131315;
+  border: 1px solid var(--line);
+  padding: 16px;
+  display: grid;
+  grid-template-columns: 42px 1fr auto;
+  grid-template-rows: auto auto;
+  align-items: center;
+  gap: 8px 12px;
+  position: relative;
+}
+.memberCard.disabled {
+  opacity: 0.58;
+}
+.memberAvatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #2d211b;
+  border: 1px solid #62371f;
+  color: var(--orange);
+  font: 700 14px "Barlow Condensed";
+}
+.memberAvatar.role-owner {
+  background: var(--orange);
+  color: #111;
+}
+.memberAvatar.role-driver {
+  background: #20262d;
+  color: #8bb4df;
+  border-color: #334b64;
+}
+.memberIdentity {
+  min-width: 0;
+}
+.memberIdentity h3 {
+  font-size: 12px;
+  margin: 0 0 6px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.memberIdentity h3 small {
+  font: 700 7px "Barlow Condensed";
+  color: var(--orange);
+  background: #2b1c15;
+  padding: 2px 5px;
+}
+.memberIdentity p {
+  margin: 0;
+  color: #777;
+  font-size: 9px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.memberIdentity p svg {
+  width: 11px;
+  flex: none;
+}
+.roleBadge {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 7px;
+  background: #202023;
+  color: #aaa;
+  font: 600 8px "Barlow Condensed";
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.roleBadge svg {
+  width: 11px;
+}
+.roleBadge.owner {
+  color: var(--orange);
+}
+.accessState {
+  grid-column: 1/2;
+  text-align: center;
+  font: 600 7px "Barlow Condensed";
+  text-transform: uppercase;
+  color: #666;
+}
+.accessState i {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  margin-right: 4px;
+}
+.accessState.on i {
+  background: #64bb85;
+}
+.accessState.off i {
+  background: #e05c46;
+}
+.memberActions {
+  grid-column: 2/4;
+  display: flex;
+  justify-content: flex-end;
+  gap: 3px;
+}
+.memberActions button {
+  border: 0;
+  background: transparent;
+  color: #777;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 7px;
+  font-size: 8px;
+  cursor: pointer;
+}
+.memberActions button:hover {
+  background: #242427;
+  color: #eee;
+}
+.memberActions svg {
+  width: 12px;
+}
+.memberActions .dangerText:hover {
+  color: #ff6044;
+  background: #301915;
+}
+.memberEmpty {
+  grid-column: 1/3;
+  border: 1px solid var(--line);
+}
+@media (max-width: 900px) {
+  .memberGrid {
+    grid-template-columns: 1fr;
+  }
+  .memberEmpty {
+    grid-column: 1;
+  }
+  .memberTools {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .memberTools .filters {
+    margin: 0;
+    overflow: auto;
+  }
+}
+@media (max-width: 720px) {
+  .teamPage .pageTitle .primary {
+    width: 40px;
+    padding: 0;
+    justify-content: center;
+    font-size: 0;
+  }
+  .teamStats > div {
+    padding: 12px 10px;
+    gap: 8px;
+  }
+  .teamStats > div > span {
+    width: 30px;
+    height: 30px;
+  }
+  .teamStats b {
+    font-size: 21px;
+  }
+  .memberTools {
+    padding: 10px;
+  }
+  .memberCard {
+    grid-template-columns: 38px 1fr;
+    grid-template-rows: auto auto auto;
+    padding: 13px;
+  }
+  .memberAvatar {
+    width: 38px;
+    height: 38px;
+  }
+  .roleBadge {
+    grid-column: 1/2;
+    grid-row: 2;
+    justify-self: start;
+  }
+  .accessState {
+    grid-column: 2;
+    grid-row: 2;
+    text-align: left;
+  }
+  .memberActions {
+    grid-column: 1/3;
+    grid-row: 3;
+    border-top: 1px solid #252528;
+    padding-top: 6px;
+  }
+  .memberActions button {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+/* Tasks */
+.taskSummary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border: 1px solid var(--line);
+  background: #121214;
+  margin-bottom: 14px;
+}
+.taskSummary > div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 18px;
+  border-right: 1px solid var(--line);
+}
+.taskSummary > div:last-child {
+  border: 0;
+}
+.taskSummary > div > span {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  background: #232326;
+  color: #888;
+}
+.taskSummary svg {
+  width: 16px;
+}
+.taskSummary p {
+  margin: 0;
+}
+.taskSummary b {
+  display: block;
+  font: 700 24px "Barlow Condensed";
+}
+.taskSummary small {
+  font: 600 8px "Barlow Condensed";
+  color: #777;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+.taskSummary .summary-progress > span {
+  color: var(--orange);
+  background: #2b1d16;
+}
+.taskSummary .summary-blocked > span {
+  color: #ef6a52;
+  background: #301915;
+}
+.taskSummary .summary-done > span {
+  color: #69bd88;
+  background: #17291e;
+}
+.taskToolbar {
+  height: 48px;
+  background: #141416;
+  border: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  margin-bottom: 10px;
+}
+.scopeSwitch {
+  display: flex;
+  gap: 4px;
+}
+.scopeSwitch button {
+  height: 30px;
+  border: 0;
+  background: transparent;
+  color: #777;
+  font-size: 9px;
+  padding: 0 12px;
+  cursor: pointer;
+}
+.scopeSwitch button.active {
+  background: #292018;
+  color: #fff;
+}
+.taskToolbar > span {
+  margin-left: auto;
+  font: 600 8px "Barlow Condensed";
+  color: #666;
+  letter-spacing: 1px;
+}
+.kanban {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(230px, 1fr));
+  gap: 9px;
+  align-items: start;
+  overflow-x: auto;
+  padding-bottom: 10px;
+}
+.taskColumn {
+  background: #101012;
+  border: 1px solid var(--line);
+  min-width: 230px;
+}
+.columnHead {
+  height: 42px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  border-top: 2px solid #555;
+  color: #aaa;
+}
+.col-progress .columnHead {
+  border-color: var(--orange);
+}
+.col-blocked .columnHead {
+  border-color: #e75c44;
+}
+.col-done .columnHead {
+  border-color: #5eb57e;
+}
+.columnHead span {
+  font: 700 10px "Barlow Condensed";
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+.columnHead b {
+  margin-left: auto;
+  background: #26262a;
+  border-radius: 10px;
+  padding: 2px 6px;
+  font-size: 8px;
+}
+.columnBody {
+  padding: 7px;
+  display: grid;
+  gap: 7px;
+}
+.taskCard {
+  background: #19191c;
+  border: 1px solid #29292d;
+  padding: 12px;
+  cursor: pointer;
+  transition: 0.15s;
+}
+.taskCard:hover {
+  border-color: #4a3429;
+  transform: translateY(-1px);
+}
+.taskCardTop {
+  display: flex;
+  align-items: center;
+}
+.taskCardTop > button {
+  margin-left: auto;
+  border: 0;
+  background: none;
+  color: #666;
+  cursor: pointer;
+}
+.taskCardTop > button svg {
+  width: 13px;
+}
+.priority {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font: 700 7px "Barlow Condensed";
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  color: #999;
+}
+.priority svg {
+  width: 10px;
+}
+.priority.critical {
+  color: #ff6044;
+}
+.priority.high {
+  color: #f29b38;
+}
+.priority.medium {
+  color: #b5a56e;
+}
+.taskCard h3 {
+  font: 700 13px "Barlow Condensed";
+  text-transform: uppercase;
+  margin: 10px 0 6px;
+}
+.taskCard > p {
+  font-size: 9px;
+  line-height: 1.5;
+  color: #777;
+  margin: 0 0 9px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.kartTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #222225;
+  color: #aaa;
+  font-size: 8px;
+  padding: 4px 6px;
+}
+.kartTag svg {
+  width: 10px;
+}
+.taskMeta {
+  border-top: 1px solid #29292d;
+  margin-top: 10px;
+  padding-top: 9px;
+  display: grid;
+  gap: 6px;
+}
+.taskMeta span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #777;
+  font-size: 8px;
+}
+.taskMeta svg {
+  width: 10px;
+}
+.taskMeta span.late {
+  color: #ff6044;
+}
+.taskProgress {
+  margin-top: 10px;
+}
+.taskProgress > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  color: #777;
+  font: 600 7px "Barlow Condensed";
+  text-transform: uppercase;
+}
+.taskProgress .bar {
+  height: 2px;
+  margin-top: 5px;
+}
+.cardStatus {
+  display: flex;
+  gap: 4px;
+  border-top: 1px solid #29292d;
+  margin-top: 10px;
+  padding-top: 8px;
+}
+.cardStatus button {
+  width: 25px;
+  height: 24px;
+  border: 1px solid #303034;
+  background: transparent;
+  color: #666;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.cardStatus button.active {
+  color: var(--orange);
+  background: #2a1d17;
+  border-color: #56311f;
+}
+.cardStatus svg {
+  width: 12px;
+}
+.columnEmpty {
+  padding: 25px 5px;
+  text-align: center;
+  color: #4d4d52;
+  font-size: 8px;
+}
+.taskModal {
+  width: min(620px, 100%);
+}
+.form textarea {
+  min-height: 75px;
+  resize: vertical;
+  border: 1px solid #333338;
+  background: #0e0e10;
+  color: #eee;
+  padding: 10px;
+  outline: none;
+  font: inherit;
+}
+.form textarea:focus {
+  border-color: var(--orange);
+}
+.checklistEditor {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 5px !important;
+}
+.checklistEditor > span {
+  font: 600 9px "Barlow Condensed";
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 2px;
+}
+.checklistEditor > div {
+  display: flex !important;
+  gap: 5px !important;
+}
+.checklistEditor button {
+  width: 34px;
+  border: 1px solid #333338;
+  background: #19191c;
+  color: #777;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.checklistEditor button svg {
+  width: 14px;
+}
+.checklistEditor > div > button:first-child {
+  color: var(--orange);
+}
+.checklistEditor input {
+  flex: 1;
+}
+.addCheck input {
+  border-style: dashed;
+}
+.deleteLink {
+  margin-right: auto;
+  border: 0;
+  background: none;
+  color: #e45b44;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 9px;
+  cursor: pointer;
+}
+.deleteLink svg {
+  width: 13px;
+}
+@media (max-width: 1000px) {
+  .kanban {
+    grid-template-columns: repeat(4, 270px);
+  }
+}
+@media (max-width: 720px) {
+  .tasksPage .pageTitle .primary {
+    width: 40px;
+    padding: 0;
+    justify-content: center;
+    font-size: 0;
+  }
+  .taskSummary {
+    grid-template-columns: 1fr 1fr;
+  }
+  .taskSummary > div:nth-child(2) {
+    border-right: 0;
+  }
+  .taskSummary > div:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--line);
+  }
+  .taskSummary > div {
+    padding: 10px;
+  }
+  .kanban {
+    margin-right: -14px;
+    grid-template-columns: repeat(4, 82vw);
+    scroll-snap-type: x mandatory;
+  }
+  .taskColumn {
+    scroll-snap-align: start;
+  }
+  .taskModal .form > div {
+    grid-template-columns: 1fr;
+  }
+  .taskModal .checklistEditor > div {
+    display: flex !important;
+  }
+  .taskModal .modalActions {
+    position: sticky;
+    bottom: 0;
+    background: #151517;
+  }
+}
+
+/* Calendar */
+.calendarLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.65fr) minmax(300px, 0.75fr);
+  gap: 14px;
+}
+.calendarCard,
+.upcoming {
+  background: #121214;
+  border: 1px solid var(--line);
+}
+.calendarTop {
+  height: 54px;
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  border-bottom: 1px solid var(--line);
+  gap: 5px;
+}
+.calendarTop h2 {
+  font: 700 18px "Barlow Condensed";
+  text-transform: uppercase;
+  margin: 0 8px;
+  min-width: 150px;
+}
+.calendarTop > button {
+  width: 30px;
+  height: 30px;
+  border: 1px solid #303034;
+  background: #19191c;
+  color: #888;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.calendarTop button svg {
+  width: 15px;
+}
+.calendarTop .todayBtn {
+  width: auto;
+  padding: 0 12px;
+  margin-left: auto;
+  font: 600 9px "Barlow Condensed";
+  text-transform: uppercase;
+}
+.weekDays {
+  height: 30px;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  background: #0e0e10;
+  border-bottom: 1px solid var(--line);
+}
+.weekDays span {
+  display: grid;
+  place-items: center;
+  color: #666;
+  font: 600 8px "Barlow Condensed";
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+.monthGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+.dayCell {
+  min-height: 105px;
+  border-right: 1px solid #262629;
+  border-bottom: 1px solid #262629;
+  padding: 7px;
+  overflow: hidden;
+}
+.dayCell:nth-child(7n) {
+  border-right: 0;
+}
+.dayCell > span {
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  font: 600 9px "Barlow Condensed";
+  color: #aaa;
+}
+.dayCell.outside {
+  background: #0e0e10;
+}
+.dayCell.outside > span {
+  color: #3e3e43;
+}
+.dayCell.current > span {
+  background: var(--orange);
+  color: #111;
+  border-radius: 50%;
+}
+.miniEvent {
+  width: 100%;
+  height: 23px;
+  border: 0;
+  border-left: 2px solid #777;
+  background: #202023;
+  color: #aaa;
+  margin-top: 3px;
+  padding: 0 5px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  text-align: left;
+  cursor: pointer;
+}
+.miniEvent.race {
+  border-color: var(--orange);
+  background: #251a15;
+}
+.miniEvent.test {
+  border-color: #55a7d8;
+  background: #17242b;
+}
+.miniEvent.meeting {
+  border-color: #aa78d4;
+  background: #221b29;
+}
+.miniEvent.training {
+  border-color: #65b784;
+}
+.miniEvent svg {
+  width: 9px;
+  flex: none;
+}
+.miniEvent b {
+  font-size: 7px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dayCell > small {
+  font-size: 7px;
+  color: #777;
+}
+.upcoming .cardHead > span {
+  margin-left: auto;
+  background: #29292d;
+  border-radius: 10px;
+  padding: 2px 7px;
+  font-size: 8px;
+}
+.upcomingEvent {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 11px;
+  padding: 14px;
+  border-bottom: 1px solid var(--line);
+  cursor: pointer;
+}
+.upcomingEvent:hover {
+  background: #171719;
+}
+.eventDate {
+  height: 52px;
+  border: 1px solid #39393d;
+  display: grid;
+  place-content: center;
+  text-align: center;
+}
+.eventDate b {
+  font: 700 23px/20px "Barlow Condensed";
+}
+.eventDate span {
+  font: 700 8px "Barlow Condensed";
+  color: var(--orange);
+  letter-spacing: 1px;
+}
+.eventType {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--orange);
+  font: 700 7px "Barlow Condensed";
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+.eventType svg {
+  width: 10px;
+}
+.upcomingEvent h3 {
+  font: 700 12px "Barlow Condensed";
+  text-transform: uppercase;
+  margin: 5px 0;
+}
+.upcomingEvent p {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #777;
+  font-size: 8px;
+  margin: 0 0 8px;
+}
+.upcomingEvent p svg {
+  width: 10px;
+}
+.upcomingEvent > div:last-child > div {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+.upcomingEvent > div:last-child > div span {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  color: #666;
+  font-size: 7px;
+}
+.upcomingEvent > div:last-child > div svg {
+  width: 9px;
+}
+.eventStatus {
+  padding: 3px 5px;
+  background: #242427;
+  text-transform: uppercase;
+  font: 600 6px "Barlow Condensed";
+}
+.eventStatus.confirmed {
+  color: #69bb87;
+  background: #17291e;
+}
+.eventStatus.cancelled {
+  color: #ee6047;
+  background: #301915;
+}
+.eventModal {
+  width: min(650px, 100%);
+}
+.participantPicker {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 6px !important;
+}
+.participantPicker > span {
+  grid-column: 1/3;
+  font: 600 9px "Barlow Condensed";
+  color: #888;
+  text-transform: uppercase;
+}
+.participantPicker label {
+  height: 42px;
+  border: 1px solid #303034;
+  background: #111113;
+  display: grid !important;
+  grid-template-columns: 16px 28px 1fr !important;
+  grid-template-rows: 1fr 1fr;
+  align-items: center;
+  gap: 0 8px !important;
+  padding: 5px 8px;
+  cursor: pointer;
+}
+.participantPicker input {
+  width: 13px;
+  height: 13px;
+  grid-row: 1/3;
+  accent-color: var(--orange);
+}
+.participantPicker i {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #2b211b;
+  color: var(--orange);
+  display: grid;
+  place-items: center;
+  grid-row: 1/3;
+  font: 700 9px "Barlow Condensed";
+}
+.participantPicker b {
+  font-size: 9px;
+  align-self: end;
+}
+.participantPicker small {
+  font-size: 7px;
+  color: #666;
+  align-self: start;
+  text-transform: capitalize;
+}
+@media (max-width: 1050px) {
+  .calendarLayout {
+    grid-template-columns: 1fr;
+  }
+  .upcoming {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .upcoming .cardHead {
+    grid-column: 1/3;
+  }
+  .upcomingEvent:nth-child(even) {
+    border-right: 1px solid var(--line);
+  }
+}
+@media (max-width: 720px) {
+  .calendarPage .pageTitle .primary {
+    width: 40px;
+    padding: 0;
+    justify-content: center;
+    font-size: 0;
+  }
+  .calendarCard {
+    overflow-x: auto;
+  }
+  .calendarTop,
+  .weekDays,
+  .monthGrid {
+    min-width: 650px;
+  }
+  .dayCell {
+    min-height: 90px;
+  }
+  .upcoming {
+    grid-template-columns: 1fr;
+  }
+  .upcoming .cardHead {
+    grid-column: 1;
+  }
+  .upcomingEvent:nth-child(even) {
+    border-right: 0;
+  }
+  .eventModal .form > div {
+    grid-template-columns: 1fr;
+  }
+  .eventModal .participantPicker {
+    grid-template-columns: 1fr !important;
+  }
+  .participantPicker > span {
+    grid-column: 1;
+  }
+  .eventModal .modalActions {
+    position: sticky;
+    bottom: 0;
+    background: #151517;
+  }
+}
+
+/* Event crew editor */
+.crewEditor {
+  display: block !important;
+  border: 1px solid #333338;
+  background: #101012;
+}
+.crewTitle {
+  height: 40px;
+  display: flex !important;
+  align-items: center;
+  padding: 0 10px;
+  border-bottom: 1px solid #29292d;
+}
+.crewTitle span {
+  font: 700 9px "Barlow Condensed";
+  color: #aaa;
+  letter-spacing: 0.8px;
+}
+.crewTitle button {
+  margin-left: auto;
+  height: 26px;
+  border: 1px solid #3b332f;
+  background: #241b16;
+  color: var(--orange);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 8px;
+  font: 600 8px "Barlow Condensed";
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.crewTitle button svg {
+  width: 11px;
+}
+.crewHead,
+.crewRow {
+  display: grid !important;
+  grid-template-columns: 1.15fr 0.8fr 55px 1.15fr 30px !important;
+  gap: 6px !important;
+  align-items: center;
+  padding: 6px 8px;
+}
+.crewHead {
+  background: #0c0c0d;
+  color: #626268;
+  font: 600 7px "Barlow Condensed";
+  letter-spacing: 0.8px;
+}
+.crewRow {
+  border-top: 1px solid #242427;
+}
+.crewRow input,
+.crewRow select {
+  width: 100%;
+  height: 34px !important;
+  background: #0e0e10;
+  border: 1px solid #333338;
+  color: #eee;
+  padding: 0 8px;
+}
+.crewRow > button {
+  width: 28px;
+  height: 28px;
+  border: 0;
+  background: transparent;
+  color: #755047;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.crewRow > button:hover {
+  background: #301915;
+  color: #ff6044;
+}
+.crewRow > button:disabled {
+  opacity: 0.2;
+  cursor: not-allowed;
+}
+.crewRow > button svg {
+  width: 13px;
+}
+@media (max-width: 650px) {
+  .crewHead {
+    display: none !important;
+  }
+  .crewRow {
+    grid-template-columns: 1fr 1fr 45px !important;
+  }
+  .crewRow input:nth-child(4) {
+    grid-column: 1/3;
+  }
+  .crewRow > button {
+    grid-column: 3;
+    grid-row: 2;
+  }
+  .crewRow input:before {
+    content: attr(aria-label);
+  }
+}
