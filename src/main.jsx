@@ -474,8 +474,12 @@ function App() {
   );
 }
 function Login({ lang, setLang, onLogin }) {
-  const [email, setEmail] = useState("owner@d3teams.com");
-  const [password, setPassword] = useState("D3teams2026!");
+  const [mode, setMode] = useState("login");
+  const [teamName, setTeamName] = useState("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const submit = async (e) => {
@@ -483,10 +487,12 @@ function Login({ lang, setLang, onLogin }) {
     setLoading(true);
     setError("");
     try {
-      const r = await fetch(apiUrl("/auth/login"), {
+      if (mode === "register" && password !== confirmPassword)
+        throw Error(lang === "PL" ? "Hasła nie są identyczne" : "Passwords do not match");
+      const r = await fetch(apiUrl(mode === "register" ? "/auth/register" : "/auth/login"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ teamName, name, email, password }),
       });
       const d = await r.json();
       if (!r.ok) throw Error(d.error);
@@ -530,19 +536,25 @@ function Login({ lang, setLang, onLogin }) {
           </button>
         </div>
         <form onSubmit={submit}>
-          <p className="eyebrow">SECURE TEAM ACCESS</p>
-          <h2>{lang === "PL" ? "Witaj ponownie" : "Welcome back"}</h2>
+          <p className="eyebrow">{mode === "register" ? "CREATE YOUR TEAM" : "SECURE TEAM ACCESS"}</p>
+          <h2>{mode === "register" ? (lang === "PL" ? "Załóż konto zespołu" : "Create your team") : (lang === "PL" ? "Witaj ponownie" : "Welcome back")}</h2>
           <p>
-            {lang === "PL"
-              ? "Zaloguj się do zespołu D3 Karting."
-              : "Sign in to your D3 Karting workspace."}
+            {mode === "register"
+              ? (lang === "PL" ? "Utwórz przestrzeń pracy i konto właściciela." : "Set up your workspace and owner account.")
+              : (lang === "PL" ? "Zaloguj się do swojego zespołu." : "Sign in to your team workspace.")}
           </p>
+          {mode === "register" && <>
+            <label>{lang === "PL" ? "Nazwa zespołu" : "Team name"}<input value={teamName} onChange={(e) => setTeamName(e.target.value)} required minLength={2} /></label>
+            <label>{lang === "PL" ? "Imię i nazwisko" : "Your name"}<input value={name} onChange={(e) => setName(e.target.value)} required minLength={2} autoComplete="name" /></label>
+          </>}
           <label>
             Email
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              required
+              autoComplete="email"
             />
           </label>
           <label>
@@ -551,14 +563,26 @@ function Login({ lang, setLang, onLogin }) {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={mode === "register" ? 10 : undefined}
+              autoComplete={mode === "register" ? "new-password" : "current-password"}
             />
           </label>
+          {mode === "register" && <label>
+            {lang === "PL" ? "Powtórz hasło" : "Confirm password"}
+            <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required minLength={10} autoComplete="new-password" />
+          </label>}
+          {mode === "register" && <small className="passwordHint">{lang === "PL" ? "Minimum 10 znaków, wielka i mała litera oraz cyfra." : "At least 10 characters with uppercase, lowercase and a number."}</small>}
           {error && <div className="loginError">{error}</div>}
           <button className="loginSubmit" disabled={loading}>
-            {loading ? "…" : lang === "PL" ? "Zaloguj się" : "Sign in"}
+            {loading ? "…" : mode === "register" ? (lang === "PL" ? "Utwórz zespół" : "Create team") : (lang === "PL" ? "Zaloguj się" : "Sign in")}
             <ArrowUpRight />
           </button>
-          <small>Demo: owner@d3teams.com / D3teams2026!</small>
+          <button type="button" className="authSwitch" onClick={() => { setMode(mode === "login" ? "register" : "login"); setError(""); }}>
+            {mode === "login"
+              ? (lang === "PL" ? "Nie masz konta? Zarejestruj zespół" : "New to D3Teams? Create a team")
+              : (lang === "PL" ? "Masz już konto? Zaloguj się" : "Already have an account? Sign in")}
+          </button>
         </form>
       </div>
     </div>

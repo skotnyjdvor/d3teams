@@ -1540,6 +1540,9 @@ header {
   font-size: 8px;
   margin-top: 14px;
 }
+.loginPanel .passwordHint{color:#858585;margin-top:-8px;line-height:1.4}
+.authSwitch{width:100%;border:0;background:transparent;color:var(--orange);font:700 11px "Barlow Condensed";letter-spacing:.04em;cursor:pointer;padding:16px 0 2px}
+.authSwitch:hover{text-decoration:underline}
 .loginError,
 .apiError {
   background: #321713;

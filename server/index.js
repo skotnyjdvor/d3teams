@@ -68,6 +68,27 @@ const shape=p=>({id:p.id,sku:p.sku,name:p.name,category:p.category,base:p.base_q
 const log=(user,partId,type,description)=>db.prepare('INSERT INTO inventory_logs(team_id,part_id,actor_id,type,description) VALUES(?,?,?,?,?)').run(user.teamId,partId,user.id,type,description);
 
 app.get('/api/health',(_,res)=>res.json({status:'ok'}));
+const normalizeEmail=value=>String(value||'').trim().toLowerCase();
+const makeSlug=name=>String(name||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,48)||'team';
+app.post('/api/auth/register',(req,res)=>{
+ const teamName=String(req.body.teamName||'').trim(),name=String(req.body.name||'').trim(),email=normalizeEmail(req.body.email),password=String(req.body.password||'');
+ if(teamName.length<2||name.length<2||!/^\S+@\S+\.\S+$/.test(email))return res.status(400).json({error:'Please provide valid team, name and email details',code:'INVALID_DETAILS'});
+ if(password.length<10||!/[a-z]/.test(password)||!/[A-Z]/.test(password)||!/[0-9]/.test(password))return res.status(400).json({error:'Password must have 10 characters, uppercase, lowercase and a number',code:'WEAK_PASSWORD'});
+ if(db.prepare('SELECT id FROM users WHERE lower(email)=?').get(email))return res.status(409).json({error:'An account with this email already exists',code:'EMAIL_EXISTS'});
+ let slug=makeSlug(teamName),suffix=1;
+ while(db.prepare('SELECT id FROM teams WHERE slug=?').get(slug))slug=`${makeSlug(teamName)}-${++suffix}`;
+ try{
+  db.exec('BEGIN IMMEDIATE');
+  const teamId=Number(db.prepare('INSERT INTO teams(name,slug) VALUES(?,?)').run(teamName,slug).lastInsertRowid);
+  const userId=Number(db.prepare("INSERT INTO users(team_id,name,email,password_hash,role,active) VALUES(?,?,?,?, 'owner',1)").run(teamId,name,email,bcrypt.hashSync(password,12)).lastInsertRowid);
+  db.exec('COMMIT');
+  const profile={id:userId,teamId,name,email,role:'owner'};
+  return res.status(201).json({token:jwt.sign(profile,secret,{expiresIn:'7d'}),user:profile,team:{id:teamId,name:teamName,slug}});
+ }catch(error){
+  try{db.exec('ROLLBACK')}catch{}
+  return res.status(500).json({error:'Could not create the team account',code:'REGISTRATION_FAILED'});
+ }
+});
 app.post('/api/auth/login',(req,res)=>{const user=db.prepare('SELECT * FROM users WHERE lower(email)=lower(?)').get(req.body.email||'');if(!user||!user.active||!bcrypt.compareSync(req.body.password||'',user.password_hash))return res.status(401).json({error:'Invalid email or password'});const profile={id:user.id,teamId:user.team_id,name:user.name,email:user.email,role:user.role};res.json({token:jwt.sign(profile,secret,{expiresIn:'7d'}),user:profile})});
 app.get('/api/auth/me',auth,(req,res)=>res.json({user:req.user}));
 const publicUser=u=>({id:u.id,name:u.name,email:u.email,role:u.role,active:!!u.active});
