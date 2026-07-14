@@ -9,8 +9,9 @@ import {dirname, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
-mkdirSync(resolve(root,'data'),{recursive:true});
-const db=new DatabaseSync(resolve(root,'data','d3teams.sqlite'));
+const dbPath=process.env.DB_PATH||resolve(root,'data','d3teams.sqlite');
+mkdirSync(dirname(dbPath),{recursive:true});
+const db=new DatabaseSync(dbPath);
 db.exec(`PRAGMA foreign_keys=ON; PRAGMA journal_mode=WAL;
 CREATE TABLE IF NOT EXISTS teams(id INTEGER PRIMARY KEY,name TEXT NOT NULL,slug TEXT UNIQUE NOT NULL);
 CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY,team_id INTEGER NOT NULL,name TEXT NOT NULL,email TEXT UNIQUE NOT NULL,password_hash TEXT NOT NULL,role TEXT NOT NULL CHECK(role IN ('owner','manager','mechanic','driver')),FOREIGN KEY(team_id) REFERENCES teams(id));
@@ -25,8 +26,10 @@ if(!db.prepare('PRAGMA table_info(events)').all().some(c=>c.name==='crew_entries
 const seedParts=[['BRK-001','Brake pads CRG VEN 05','Brakes',0,0,4,'sets'],['CHN-219','Chain 219 O-Ring','Drivetrain',18,3,8,'pcs'],['OIL-001','Xeramic Racing Oil 1L','Fluids',12,4,6,'bottles'],['TYR-MG-R','MG Red slick tyres','Tyres',24,8,12,'tyres'],['TYR-MG-W','MG Wet tyres','Tyres',8,4,8,'tyres'],['SPK-NGK','NGK BR10EG spark plug','Engine',16,6,10,'pcs'],['SPR-80','Rear sprocket 80T','Drivetrain',5,2,4,'pcs'],['CBL-ACC','Accelerator cable complete','Controls',3,1,3,'pcs']];
 if(!db.prepare('SELECT id FROM teams LIMIT 1').get()){
  const teamId=Number(db.prepare('INSERT INTO teams(name,slug) VALUES(?,?)').run('D3 Karting','d3-karting').lastInsertRowid);
- const hash=bcrypt.hashSync('D3teams2026!',10);
- db.prepare('INSERT INTO users(team_id,name,email,password_hash,role) VALUES(?,?,?,?,?)').run(teamId,'Tony Kowalski','owner@d3teams.com',hash,'owner');
+ const initialPassword=process.env.INITIAL_OWNER_PASSWORD||'D3teams2026!';
+ if(process.env.NODE_ENV==='production'&&!process.env.INITIAL_OWNER_PASSWORD)throw new Error('INITIAL_OWNER_PASSWORD is required in production');
+ const hash=bcrypt.hashSync(initialPassword,10);
+ db.prepare('INSERT INTO users(team_id,name,email,password_hash,role) VALUES(?,?,?,?,?)').run(teamId,process.env.INITIAL_OWNER_NAME||'Tony Kowalski',process.env.INITIAL_OWNER_EMAIL||'owner@d3teams.com',hash,'owner');
  const add=db.prepare('INSERT INTO parts(team_id,sku,name,category,base_qty,truck_qty,min_qty,unit) VALUES(?,?,?,?,?,?,?,?)');
  for(const p of seedParts)add.run(teamId,...p);
 }
@@ -50,7 +53,14 @@ for(const e of db.prepare("SELECT id,pilot,race_class,mechanic,start_date,end_da
 const allowedClasses=['OK','OKN','OKJ','OKNJ','KZ','Mini','Rotax Senior','Rotax Junior','ROK Senior','ROK Junior','ROK Mini','ROK Baby','Pokazy','Puffo'];
 for(const e of db.prepare('SELECT id,crew_entries FROM events').all()){const rows=JSON.parse(e.crew_entries||'[]'),normalized=rows.map(r=>({...r,raceClass:allowedClasses.includes(r.raceClass)?r.raceClass:r.raceClass==='Junior'?'OKJ':r.raceClass==='Team'?'Pokazy':'OK'}));if(JSON.stringify(rows)!==JSON.stringify(normalized))db.prepare('UPDATE events SET crew_entries=? WHERE id=?').run(JSON.stringify(normalized),e.id)}
 
-const app=express(); app.use(cors()); app.use(express.json());
+const app=express();
+const allowedOrigins=(process.env.CORS_ORIGINS||'http://localhost:5173,http://127.0.0.1:5173')
+ .split(',').map(origin=>origin.trim()).filter(Boolean);
+app.use(cors({origin(origin,callback){
+ if(!origin||allowedOrigins.includes(origin))return callback(null,true);
+ return callback(new Error('Origin is not allowed by CORS'));
+}}));
+app.use(express.json({limit:'2mb'}));
 const secret=process.env.JWT_SECRET||'d3teams-local-development-secret';
 const auth=(req,res,next)=>{const token=req.headers.authorization?.replace('Bearer ','');try{req.user=jwt.verify(token,secret);next()}catch{return res.status(401).json({error:'Unauthorized'})}};
 const roles=(...allowed)=>(req,res,next)=>allowed.includes(req.user.role)?next():res.status(403).json({error:'Insufficient permissions'});
@@ -84,4 +94,5 @@ app.delete('/api/parts/:id',auth,roles('owner','manager'),(req,res)=>{const p=db
 app.post('/api/parts/:id/move',auth,roles('owner','manager','mechanic'),(req,res)=>{const p=db.prepare('SELECT * FROM parts WHERE id=? AND team_id=?').get(req.params.id,req.user.teamId);const qty=Math.max(0,+req.body.qty||0),from=req.body.from,to=from==='base'?'truck':'base';if(!p)return res.status(404).json({error:'Part not found'});if(!['base','truck'].includes(from)||!qty||p[`${from}_qty`]<qty)return res.status(400).json({error:'Invalid quantity'});db.prepare(`UPDATE parts SET ${from}_qty=${from}_qty-?,${to}_qty=${to}_qty+?,updated_at=CURRENT_TIMESTAMP WHERE id=?`).run(qty,qty,p.id);log(req.user,p.id,'move',`${qty} × ${p.name} · ${from==='base'?'Base → Truck':'Truck → Base'}`);res.json({part:shape(db.prepare('SELECT * FROM parts WHERE id=?').get(p.id))})});
 app.post('/api/parts/:id/adjust',auth,roles('owner','manager','mechanic'),(req,res)=>{const p=db.prepare('SELECT * FROM parts WHERE id=? AND team_id=?').get(req.params.id,req.user.teamId),loc=req.body.location,delta=+req.body.delta||0;if(!p)return res.status(404).json({error:'Part not found'});if(!['base','truck'].includes(loc)||p[`${loc}_qty`]+delta<0)return res.status(400).json({error:'Invalid adjustment'});db.prepare(`UPDATE parts SET ${loc}_qty=${loc}_qty+?,updated_at=CURRENT_TIMESTAMP WHERE id=?`).run(delta,p.id);log(req.user,p.id,'adjust',`${delta>0?'+':''}${delta} × ${p.name} · ${loc==='base'?'Base':'Truck'}`);res.json({part:shape(db.prepare('SELECT * FROM parts WHERE id=?').get(p.id))})});
 app.get('/api/inventory/logs',auth,(req,res)=>res.json({logs:db.prepare('SELECT description,created_at FROM inventory_logs WHERE team_id=? ORDER BY id DESC LIMIT 10').all(req.user.teamId)}));
-app.listen(3001,'127.0.0.1',()=>console.log('D3Teams API: http://127.0.0.1:3001'));
+const port=Number(process.env.PORT)||3001;
+app.listen(port,'0.0.0.0',()=>console.log(`D3Teams API listening on port ${port}`));

@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
+const API_URL=(import.meta.env.VITE_API_URL||"").replace(/\/$/,"");
+const apiUrl=(path)=>`${API_URL}/api${path}`;
 import {
   LayoutDashboard,
   Boxes,
@@ -481,7 +483,7 @@ function Login({ lang, setLang, onLogin }) {
     setLoading(true);
     setError("");
     try {
-      const r = await fetch("/api/auth/login", {
+      const r = await fetch(apiUrl("/auth/login"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -690,7 +692,7 @@ function CalendarView({ lang, session }) {
     [error, setError] = useState("");
   const canManage = ["owner", "manager"].includes(session.user.role);
   const api = async (path, options = {}) => {
-    const r = await fetch("/api" + path, {
+    const r = await fetch(apiUrl(path), {
       ...options,
       headers: {
         "Content-Type": "application/json",
@@ -1329,7 +1331,7 @@ function TasksView({ lang, session }) {
     [error, setError] = useState("");
   const canManage = ["owner", "manager"].includes(session.user.role);
   const api = async (path, options = {}) => {
-    const r = await fetch("/api" + path, {
+    const r = await fetch(apiUrl(path), {
       ...options,
       headers: {
         "Content-Type": "application/json",
@@ -1887,7 +1889,7 @@ function TeamView({ lang, session }) {
   const [draft, setDraft] = useState(blank);
   const canManage = ["owner", "manager"].includes(session.user.role);
   const api = async (path, options = {}) => {
-    const r = await fetch("/api" + path, {
+    const r = await fetch(apiUrl(path), {
       ...options,
       headers: {
         "Content-Type": "application/json",
@@ -2408,7 +2410,7 @@ function InventoryView({ lang, session }) {
   const canManage = ["owner", "manager"].includes(session.user.role);
   const canStock = ["owner", "manager", "mechanic"].includes(session.user.role);
   const api = async (path, options = {}) => {
-    const r = await fetch("/api" + path, {
+    const r = await fetch(apiUrl(path), {
       ...options,
       headers: {
         "Content-Type": "application/json",

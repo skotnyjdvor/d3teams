@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: d3teams-api
+    runtime: node
+    plan: starter
+    region: frankfurt
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: 24
+      - key: DB_PATH
+        value: /var/data/d3teams.sqlite
+      - key: CORS_ORIGINS
+        value: https://d3teams.com,https://www.d3teams.com,https://skotnyjdvor.github.io
+      - key: JWT_SECRET
+        generateValue: true
+      - key: INITIAL_OWNER_NAME
+        value: Tony Kowalski
+      - key: INITIAL_OWNER_EMAIL
+        value: owner@d3teams.com
+      - key: INITIAL_OWNER_PASSWORD
+        generateValue: true
+    disk:
+      name: d3teams-data
+      mountPath: /var/data
+      sizeGB: 1
