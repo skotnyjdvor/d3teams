@@ -304,6 +304,8 @@ function App() {
             <TasksView lang={lang} session={session} />
           ) : active === "calendar" ? (
             <CalendarView lang={lang} session={session} />
+          ) : active === "telemetry" ? (
+            <TelemetryView lang={lang} />
           ) : (
             <>
               <section className="welcome">
@@ -312,7 +314,7 @@ function App() {
                   <h1>{t.morning}</h1>
                   <p>{t.subtitle}</p>
                 </div>
-                <button className="primary">
+                <button className="primary" onClick={() => setActive("tasks")}>
                   <Plus size={18} />
                   {t.addTask}
                 </button>
@@ -325,13 +327,13 @@ function App() {
               </section>
               <section className="grid">
                 <div className="column">
-                  <Card title={t.nextEvent} action={t.viewCalendar}>
+                  <Card title={t.nextEvent} action={t.viewCalendar} onAction={() => setActive("calendar")}>
                     <EmptyOverview icon={CalendarDays} text={lang === "PL" ? "Brak nadchodzących wydarzeń" : "No upcoming events"} />
                   </Card>
-                  <Card title={t.readinessTitle} action={t.viewChecklist}>
+                  <Card title={t.readinessTitle} action={t.viewChecklist} onAction={() => setActive("tasks")}>
                     <EmptyOverview icon={ClipboardCheck} text={lang === "PL" ? "Brak danych gotowości" : "No readiness data"} />
                   </Card>
-                  <Card title={t.mechanic} action={t.tasks}>
+                  <Card title={t.mechanic} action={t.tasks} onAction={() => setActive("tasks")}>
                     <EmptyOverview icon={ClipboardCheck} text={lang === "PL" ? "Brak zadań mechaników" : "No mechanic tasks"} />
                   </Card>
                 </div>
@@ -356,19 +358,19 @@ function App() {
                   </Card>
                   <Card title={t.quick}>
                     <div className="quick">
-                      <button>
+                      <button onClick={() => setActive("tasks")}>
                         <span>
                           <Plus />
                         </span>
                         {t.addTask}
                       </button>
-                      <button>
+                      <button onClick={() => setActive("inventory")}>
                         <span>
                           <ArrowUpRight />
                         </span>
                         {t.moveStock}
                       </button>
-                      <button>
+                      <button onClick={() => setActive("telemetry")}>
                         <span>
                           <Upload />
                         </span>
@@ -376,7 +378,7 @@ function App() {
                       </button>
                     </div>
                   </Card>
-                  <Card title={t.activity} action={t.allActivity}>
+                  <Card title={t.activity} action={t.allActivity} onAction={() => setActive("inventory")}>
                     <EmptyOverview icon={History} text={lang === "PL" ? "Brak ostatniej aktywności" : "No recent activity"} />
                   </Card>
                 </div>
@@ -515,6 +517,22 @@ function Login({ lang, setLang, onLogin }) {
       </div>
     </div>
   );
+}
+
+function TelemetryView({lang}){
+  const [file,setFile]=useState(null);
+  const L=lang==="PL"
+    ? {eyebrow:"DANE WYŚCIGOWE",title:"Telemetria",sub:"Wgraj log z systemu telemetrii do dalszej analizy.",upload:"Wybierz plik logu",empty:"Nie wybrano jeszcze żadnego pliku",ready:"Plik gotowy do integracji analizatora"}
+    : {eyebrow:"RACE DATA",title:"Telemetry",sub:"Upload a telemetry system log for further analysis.",upload:"Choose log file",empty:"No telemetry file selected yet",ready:"File ready for analyzer integration"};
+  return <section className="modulePage telemetryPage">
+    <div className="moduleTitle"><div><p className="eyebrow">{L.eyebrow}</p><h1>{L.title}</h1><p>{L.sub}</p></div></div>
+    <article className="card telemetryUpload">
+      <Radio/>
+      <strong>{file?file.name:L.empty}</strong>
+      {file&&<small>{(file.size/1024).toFixed(1)} KB · {L.ready}</small>}
+      <label className="primary telemetryFile"> <Upload size={18}/>{L.upload}<input type="file" accept=".csv,.txt,.log,.ld,.xrk,.zip" onChange={e=>setFile(e.target.files?.[0]||null)}/></label>
+    </article>
+  </section>;
 }
 
 function CalendarView({ lang, session }) {
