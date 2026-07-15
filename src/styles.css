@@ -839,6 +839,28 @@ header {
   text-transform: uppercase;
   margin: 7px 0;
 }
+.teamTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.renameTeamButton {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #38383d;
+  background: #171719;
+  color: var(--orange);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.renameTeamButton:hover {
+  border-color: var(--orange);
+  background: #241b16;
+}
+.renameTeamButton svg {
+  width: 14px;
+}
 .pageTitle p {
   margin: 0;
   color: var(--muted);

@@ -311,7 +311,15 @@ function App() {
           {active === "inventory" ? (
             <InventoryView lang={lang} session={session} />
           ) : active === "members" ? (
-            <TeamView lang={lang} session={session} />
+            <TeamView
+              lang={lang}
+              session={session}
+              onTeamUpdate={(team) => {
+                const nextSession = { ...session, team };
+                localStorage.setItem("d3session", JSON.stringify(nextSession));
+                setSession(nextSession);
+              }}
+            />
           ) : active === "tasks" ? (
             <TasksView lang={lang} session={session} />
           ) : active === "calendar" ? (
@@ -1892,12 +1900,14 @@ function TasksView({ lang, session }) {
   );
 }
 
-function TeamView({ lang, session }) {
+function TeamView({ lang, session, onTeamUpdate }) {
   const L =
     lang === "PL"
       ? {
           eyebrow: "ZARZĄDZANIE DOSTĘPEM",
-          title: "Zespół D3 Karting",
+          teamPrefix: "Zespół",
+          renameTeam: "Zmień nazwę zespołu",
+          teamNamePrompt: "Nowa nazwa zespołu",
           sub: "Zarządzaj członkami zespołu, rolami i dostępem.",
           add: "Zaproś członka",
           members: "członków",
@@ -1930,7 +1940,9 @@ function TeamView({ lang, session }) {
         }
       : {
           eyebrow: "ACCESS MANAGEMENT",
-          title: "D3 Karting team",
+          teamPrefix: "Team",
+          renameTeam: "Rename team",
+          teamNamePrompt: "New team name",
           sub: "Manage team members, roles and workspace access.",
           add: "Invite member",
           members: "members",
@@ -2057,6 +2069,19 @@ function TeamView({ lang, session }) {
       setError(e.message);
     }
   };
+  const renameTeam = async () => {
+    const name = window.prompt(L.teamNamePrompt, session.team?.name || "")?.trim();
+    if (!name || name === session.team?.name) return;
+    try {
+      const result = await api("/team", {
+        method: "PUT",
+        body: JSON.stringify({ name }),
+      });
+      onTeamUpdate(result.team);
+    } catch (e) {
+      setError(e.message);
+    }
+  };
   const roles =
     session.user.role === "owner"
       ? ["owner", "manager", "mechanic", "driver"]
@@ -2066,7 +2091,19 @@ function TeamView({ lang, session }) {
       <div className="pageTitle">
         <div>
           <p className="eyebrow">{L.eyebrow}</p>
-          <h1>{L.title}</h1>
+          <div className="teamTitleRow">
+            <h1>{L.teamPrefix} {session.team?.name}</h1>
+            {session.user.role === "owner" && (
+              <button
+                className="renameTeamButton"
+                aria-label={L.renameTeam}
+                title={L.renameTeam}
+                onClick={renameTeam}
+              >
+                <Pencil />
+              </button>
+            )}
+          </div>
           <p>{L.sub}</p>
         </div>
         {canManage && (
