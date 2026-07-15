@@ -41,6 +41,7 @@ import {
   Wrench,
   Ban,
   PlayCircle,
+  Copy,
   Trophy,
   FlaskConical,
   Dumbbell,
@@ -201,10 +202,13 @@ function App() {
     return () => { current = false; };
   }, [session, active]);
   const t = copy[lang];
+  const inviteToken = new URLSearchParams(window.location.search).get("invite");
   const logout = () => {
     localStorage.removeItem("d3session");
     setSession(null);
   };
+  if (!session && inviteToken)
+    return <AcceptInvitation token={inviteToken} lang={lang} setLang={setLang} onAccept={(s) => { window.history.replaceState({}, "", window.location.pathname); localStorage.setItem("d3session", JSON.stringify(s)); setSession(s); }} />;
   if (!session)
     return (
       <Login
@@ -530,6 +534,13 @@ function Login({ lang, setLang, onLogin }) {
       </div>
     </div>
   );
+}
+
+function AcceptInvitation({token,lang,setLang,onAccept}){
+  const [invitation,setInvitation]=useState(null),[name,setName]=useState(""),[password,setPassword]=useState(""),[confirm,setConfirm]=useState(""),[error,setError]=useState(""),[loading,setLoading]=useState(true);
+  useEffect(()=>{fetch(apiUrl(`/invitations/${token}`)).then(async r=>{const d=await r.json();if(!r.ok)throw Error(d.error);return d.invitation}).then(setInvitation).catch(e=>setError(e.message)).finally(()=>setLoading(false))},[token]);
+  const submit=async e=>{e.preventDefault();setError("");if(password!==confirm)return setError(lang==="PL"?"Hasła nie są identyczne":"Passwords do not match");setLoading(true);try{const r=await fetch(apiUrl(`/invitations/${token}/accept`),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name,password})}),d=await r.json();if(!r.ok)throw Error(d.error);onAccept(d)}catch(e){setError(e.message)}finally{setLoading(false)}};
+  return <div className="loginPage"><div className="loginVisual"><Logo/><div><span>TEAM INVITATION</span><h1>JOIN<br/><em>THE GRID.</em></h1><p>{invitation?`${invitation.teamName} · ${invitation.role}`:"D3Teams race operations"}</p></div><small>D3TEAMS · 2026</small></div><div className="loginPanel"><div className="loginLang"><button className={lang==="EN"?"selected":""} onClick={()=>setLang("EN")}>EN</button><button className={lang==="PL"?"selected":""} onClick={()=>setLang("PL")}>PL</button></div><form onSubmit={submit}><p className="eyebrow">SECURE INVITATION</p><h2>{lang==="PL"?"Dołącz do zespołu":"Join the team"}</h2>{invitation&&<p>{invitation.email} · {invitation.teamName}</p>}<label>{lang==="PL"?"Imię i nazwisko":"Full name"}<input value={name} onChange={e=>setName(e.target.value)} required minLength={2}/></label><label>{lang==="PL"?"Hasło":"Password"}<input type="password" value={password} onChange={e=>setPassword(e.target.value)} required minLength={10}/></label><label>{lang==="PL"?"Powtórz hasło":"Confirm password"}<input type="password" value={confirm} onChange={e=>setConfirm(e.target.value)} required minLength={10}/></label>{error&&<div className="loginError">{error}</div>}<button className="loginSubmit" disabled={loading||!invitation}>{loading?"…":lang==="PL"?"Dołącz do zespołu":"Join team"}<ArrowUpRight/></button></form></div></div>;
 }
 
 function TelemetryView({lang}){
@@ -1794,7 +1805,7 @@ function TeamView({ lang, session }) {
           eyebrow: "ZARZĄDZANIE DOSTĘPEM",
           title: "Zespół D3 Karting",
           sub: "Zarządzaj członkami zespołu, rolami i dostępem.",
-          add: "Dodaj członka",
+          add: "Zaproś członka",
           members: "członków",
           active: "aktywnych",
           roles: "role",
@@ -1809,7 +1820,7 @@ function TeamView({ lang, session }) {
           deactivate: "Dezaktywuj",
           activate: "Aktywuj",
           delete: "Usuń",
-          addTitle: "Nowy członek zespołu",
+          addTitle: "Zaproś członka zespołu",
           editTitle: "Edytuj członka",
           name: "Imię i nazwisko",
           email: "Email",
@@ -1827,7 +1838,7 @@ function TeamView({ lang, session }) {
           eyebrow: "ACCESS MANAGEMENT",
           title: "D3 Karting team",
           sub: "Manage team members, roles and workspace access.",
-          add: "Add member",
+          add: "Invite member",
           members: "members",
           active: "active",
           roles: "roles",
@@ -1842,7 +1853,7 @@ function TeamView({ lang, session }) {
           deactivate: "Deactivate",
           activate: "Activate",
           delete: "Delete",
-          addTitle: "Add team member",
+          addTitle: "Invite team member",
           editTitle: "Edit member",
           name: "Full name",
           email: "Email",
@@ -1857,6 +1868,8 @@ function TeamView({ lang, session }) {
           noResults: "No team members match your search",
         };
   const [users, setUsers] = useState([]),
+    [invitations, setInvitations] = useState([]),
+    [inviteResult, setInviteResult] = useState(null),
     [query, setQuery] = useState(""),
     [roleFilter, setRoleFilter] = useState("all"),
     [modal, setModal] = useState(null),
@@ -1888,6 +1901,7 @@ function TeamView({ lang, session }) {
   const refresh = async () => {
     try {
       setUsers((await api("/team/users")).users);
+      if (canManage) setInvitations((await api("/team/invitations")).invitations);
     } catch (e) {
       setError(e.message);
     }
@@ -1904,6 +1918,7 @@ function TeamView({ lang, session }) {
   const openAdd = () => {
     setSelected(null);
     setDraft(blank);
+    setInviteResult(null);
     setModal("edit");
   };
   const openEdit = (u) => {
@@ -1913,16 +1928,21 @@ function TeamView({ lang, session }) {
   };
   const save = async () => {
     try {
-      await api(selected ? `/team/users/${selected.id}` : "/team/users", {
-        method: selected ? "PUT" : "POST",
-        body: JSON.stringify(draft),
-      });
-      setModal(null);
-      refresh();
+      if (!selected) {
+        const result = await api("/team/invitations", {method:"POST",body:JSON.stringify({email:draft.email,role:draft.role})});
+        setInviteResult(result.invitation);
+        refresh();
+      } else {
+        await api(`/team/users/${selected.id}`, {method:"PUT",body:JSON.stringify(draft)});
+        setModal(null);
+        refresh();
+      }
     } catch (e) {
       setError(e.message);
     }
   };
+  const revokeInvitation=async id=>{try{await api(`/team/invitations/${id}`,{method:"DELETE"});refresh()}catch(e){setError(e.message)}};
+  const copyInvite=async link=>{await navigator.clipboard.writeText(link);};
   const toggle = async (u) => {
     try {
       await api(`/team/users/${u.id}`, {
@@ -1998,6 +2018,7 @@ function TeamView({ lang, session }) {
           </p>
         </div>
       </div>
+      {canManage && invitations.length > 0 && <div className="pendingInvites"><div className="pendingTitle"><Mail/><strong>{lang === "PL" ? "Oczekujące zaproszenia" : "Pending invitations"}</strong><b>{invitations.length}</b></div>{invitations.map(inv=><div className="pendingInvite" key={inv.id}><span>{inv.email}</span><small>{L[inv.role]} · {lang === "PL" ? "ważne do" : "expires"} {new Date(inv.expiresAt).toLocaleDateString(lang === "PL" ? "pl-PL" : "en-GB")}</small><button onClick={()=>revokeInvitation(inv.id)}><Trash2/>{lang === "PL" ? "Odwołaj" : "Revoke"}</button></div>)}</div>}
       <div className="memberTools">
         <div className="inventorySearch">
           <Search />
@@ -2115,9 +2136,9 @@ function TeamView({ lang, session }) {
                 <X />
               </button>
             </div>
-            {modal === "edit" && (
+            {modal === "edit" && !inviteResult && (
               <div className="form">
-                <label>
+                {selected && <label>
                   {L.name}
                   <input
                     value={draft.name}
@@ -2125,7 +2146,7 @@ function TeamView({ lang, session }) {
                       setDraft({ ...draft, name: e.target.value })
                     }
                   />
-                </label>
+                </label>}
                 <label>
                   {L.email}
                   <input
@@ -2137,18 +2158,6 @@ function TeamView({ lang, session }) {
                     }
                   />
                 </label>
-                {!selected && (
-                  <label>
-                    {L.password}
-                    <input
-                      type="password"
-                      value={draft.password}
-                      onChange={(e) =>
-                        setDraft({ ...draft, password: e.target.value })
-                      }
-                    />
-                  </label>
-                )}
                 <label>
                   {L.role}
                   <select
@@ -2166,6 +2175,7 @@ function TeamView({ lang, session }) {
                 </label>
               </div>
             )}
+            {inviteResult && <div className="inviteResult"><span><Mail/></span><strong>{lang === "PL" ? "Zaproszenie gotowe" : "Invitation ready"}</strong><p>{inviteResult.email}</p><div><input readOnly value={inviteResult.inviteLink}/><button onClick={()=>copyInvite(inviteResult.inviteLink)}><Copy/>{lang === "PL" ? "Kopiuj" : "Copy link"}</button></div><small>{lang === "PL" ? "Link jest ważny przez 7 dni." : "The link is valid for 7 days."}</small></div>}
             {modal === "delete" && (
               <div className="deleteContent">
                 <span>
@@ -2181,12 +2191,12 @@ function TeamView({ lang, session }) {
               <button className="secondary" onClick={() => setModal(null)}>
                 {L.cancel}
               </button>
-              <button
+              {!inviteResult && <button
                 className={modal === "delete" ? "dangerButton" : "primary"}
                 onClick={modal === "delete" ? remove : save}
               >
-                {modal === "delete" ? L.delete : selected ? L.save : L.create}
-              </button>
+                {modal === "delete" ? L.delete : selected ? L.save : (lang === "PL" ? "Utwórz zaproszenie" : "Create invitation")}
+              </button>}
             </div>
           </div>
         </div>
