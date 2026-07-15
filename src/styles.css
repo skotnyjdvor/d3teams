@@ -1575,6 +1575,70 @@ header {
 .emptyOverview{min-height:96px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:#686870;text-align:center;font-size:11px}
 .emptyOverview svg{width:24px;height:24px;color:#45454b}
 .stock .emptyOverview{grid-column:1/-1;width:100%}
+
+/* Overview readability */
+.welcome .eyebrow {
+  font-size: 12px;
+  font-weight: 700;
+}
+.metric > span {
+  color: #a3a3aa;
+  font-size: 12px;
+  font-weight: 700;
+}
+.metric small {
+  color: #a3a3aa;
+  font-size: 10px;
+}
+.cardHead button {
+  color: #a9a9b0;
+  font-size: 11px;
+}
+.eventInfo .live {
+  font-size: 10px;
+}
+.eventInfo p,
+.status span,
+.status b {
+  color: #aaaab2;
+  font-size: 11px;
+}
+.ring span {
+  color: #a3a3aa;
+  font-size: 10px;
+}
+.task small,
+.location span {
+  color: #a3a3aa;
+  font-size: 11px;
+}
+.task > span,
+.stock small {
+  font-size: 10px;
+}
+.quick button {
+  color: #c1c1c7;
+  font-size: 11px;
+}
+.activities p {
+  font-size: 11px;
+}
+.activities small {
+  color: #96969e;
+  font-size: 10px;
+}
+.emptyOverview {
+  color: #92929a;
+  font-size: 12px;
+}
+.emptyOverview svg {
+  color: #62626a;
+}
+@media (max-width: 720px) {
+  .cardHead button {
+    font-size: 0;
+  }
+}
 .telemetryUpload{min-height:280px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;text-align:center}
 .telemetryUpload>svg{width:42px;height:42px;color:var(--orange)}
 .telemetryUpload strong{font:700 18px "Barlow Condensed"}
