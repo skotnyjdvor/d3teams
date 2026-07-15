@@ -569,6 +569,8 @@ function CalendarView({ lang, session }) {
     "Mini",
     "Rotax Senior",
     "Rotax Junior",
+    "Rotax Micro Max",
+    "Rotax Mini Max",
     "ROK Senior",
     "ROK Junior",
     "ROK Mini",

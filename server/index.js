@@ -52,7 +52,7 @@ if(!db.prepare('SELECT id FROM events LIMIT 1').get()){
 db.prepare("UPDATE events SET pilot='Kacper Zieliński',race_class='Senior',mechanic='Marek Nowak' WHERE type IN ('race','test') AND pilot='' ").run();
 db.prepare("UPDATE events SET pilot='—',race_class='Team',mechanic='Marek Nowak' WHERE type IN ('meeting','training') AND pilot='' ").run();
 for(const e of db.prepare("SELECT id,pilot,race_class,mechanic,start_date,end_date FROM events WHERE crew_entries='[]'").all()){const days=Math.round((new Date(e.end_date)-new Date(e.start_date))/86400000)+1;db.prepare('UPDATE events SET crew_entries=? WHERE id=?').run(JSON.stringify([{pilot:e.pilot||'',raceClass:e.race_class||'',days,mechanic:e.mechanic||''}]),e.id)}
-const allowedClasses=['OK','OKN','OKJ','OKNJ','KZ','Mini','Rotax Senior','Rotax Junior','ROK Senior','ROK Junior','ROK Mini','ROK Baby','Pokazy','Puffo'];
+const allowedClasses=['OK','OKN','OKJ','OKNJ','KZ','Mini','Rotax Senior','Rotax Junior','Rotax Micro Max','Rotax Mini Max','ROK Senior','ROK Junior','ROK Mini','ROK Baby','Pokazy','Puffo'];
 for(const e of db.prepare('SELECT id,crew_entries FROM events').all()){const rows=JSON.parse(e.crew_entries||'[]'),normalized=rows.map(r=>({...r,raceClass:allowedClasses.includes(r.raceClass)?r.raceClass:r.raceClass==='Junior'?'OKJ':r.raceClass==='Team'?'Pokazy':'OK'}));if(JSON.stringify(rows)!==JSON.stringify(normalized))db.prepare('UPDATE events SET crew_entries=? WHERE id=?').run(JSON.stringify(normalized),e.id)}
 
 const app=express();
