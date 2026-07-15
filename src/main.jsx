@@ -170,7 +170,7 @@ const nav = [
 function Logo() {
   return (
     <div className="logo">
-      <div className="logoMark">D3</div>
+      <img className="logoImage" src="/d3teams-logo.png" alt="D3Teams" />
       <div>
         <strong>D3TEAMS</strong>
         <small>RACE OPERATIONS</small>
