@@ -7,8 +7,6 @@ import {
   Boxes,
   ClipboardCheck,
   CalendarDays,
-  FileText,
-  BarChart3,
   Radio,
   Bell,
   Search,
@@ -165,8 +163,6 @@ const nav = [
   ["inventory", Boxes],
   ["tasks", ClipboardCheck],
   ["calendar", CalendarDays],
-  ["documents", FileText],
-  ["reports", BarChart3],
   ["telemetry", Radio],
   ["members", Users],
 ];
