@@ -2836,3 +2836,87 @@ header {
     content: attr(aria-label);
   }
 }
+
+/* Application-wide minimum readable type */
+.app small,
+.app .logo small,
+.app .user small,
+.app .metric small,
+.app .eventInfo .live,
+.app .ring span,
+.app .task > span,
+.app .stock small,
+.app .quick button,
+.app .activities p,
+.app .historyRow p,
+.app .mobileNav button,
+.app .inventoryStats small,
+.app .filters button,
+.app .filters button b,
+.app .tableHead,
+.app .partRow,
+.app .stockState,
+.app .form label,
+.app .teamStats small,
+.app .memberIdentity h3 small,
+.app .memberIdentity p,
+.app .roleBadge,
+.app .accessState,
+.app .memberActions button,
+.app .taskSummary small,
+.app .scopeSwitch button,
+.app .taskToolbar > span,
+.app .columnHead b,
+.app .priority,
+.app .taskCard > p,
+.app .kartTag,
+.app .taskMeta span,
+.app .taskProgress > div:first-child,
+.app .columnEmpty,
+.app .checklistEditor > span,
+.app .calendarTop .todayBtn,
+.app .weekDays span,
+.app .dayCell > span,
+.app .miniEvent b,
+.app .upcoming .cardHead > span,
+.app .eventDate span,
+.app .eventType,
+.app .upcomingEvent p,
+.app .upcomingEvent > div:last-child > div span,
+.app .eventStatus,
+.app .participantPicker > span,
+.app .participantPicker b,
+.app .crewTitle span,
+.app .crewTitle button,
+.app .crewHead,
+.app .deleteLink {
+  font-size: 11px !important;
+}
+.loginPage small,
+.loginPage label,
+.loginPanel .passwordHint,
+.loginLang button {
+  font-size: 11px !important;
+}
+.app .task small,
+.app .location span,
+.app .activities small,
+.app .empty,
+.app .emptyOverview,
+.app .columnEmpty,
+.app .memberIdentity p,
+.app .taskCard > p,
+.app .taskMeta span,
+.app .weekDays span,
+.app .dayCell > small,
+.app .upcomingEvent p,
+.app .upcomingEvent > div:last-child > div span,
+.app .participantPicker small,
+.app .crewHead {
+  color: #9898a1 !important;
+}
+@media (max-width: 720px) {
+  .app .cardHead button {
+    font-size: 0 !important;
+  }
+}
