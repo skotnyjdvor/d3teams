@@ -620,6 +620,11 @@ function CalendarView({ lang, session }) {
           mechanic: "MECHANIK",
           crewTable: "OBSADA WYDARZENIA",
           addCrew: "Dodaj wiersz",
+          savedCrew: "Zapisany skład",
+          chooseCrew: "Wybierz skład",
+          applyCrew: "Zastosuj",
+          saveCrew: "Zapisz skład",
+          crewName: "Nazwa składu",
           discardChanges:
             "Masz niezapisane zmiany. Czy na pewno chcesz zamknąć bez zapisywania?",
           days: ["Pn", "Wt", "Śr", "Cz", "Pt", "So", "Nd"],
@@ -664,6 +669,11 @@ function CalendarView({ lang, session }) {
           mechanic: "MECHANIC",
           crewTable: "EVENT CREW",
           addCrew: "Add row",
+          savedCrew: "Saved crew",
+          chooseCrew: "Choose crew",
+          applyCrew: "Apply",
+          saveCrew: "Save crew",
+          crewName: "Crew name",
           discardChanges:
             "You have unsaved changes. Are you sure you want to close without saving?",
           days: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
@@ -685,6 +695,8 @@ function CalendarView({ lang, session }) {
   };
   const [events, setEvents] = useState([]),
     [members, setMembers] = useState([]),
+    [crewTemplates, setCrewTemplates] = useState([]),
+    [crewTemplateId, setCrewTemplateId] = useState(""),
     [viewDate, setViewDate] = useState(new Date(2026, 6, 1)),
     [modal, setModal] = useState(null),
     [selected, setSelected] = useState(null),
@@ -708,9 +720,14 @@ function CalendarView({ lang, session }) {
   };
   const refresh = async () => {
     try {
-      const [e, u] = await Promise.all([api("/events"), api("/team/users")]);
+      const [e, u, c] = await Promise.all([
+        api("/events"),
+        api("/team/users"),
+        api("/crew-templates"),
+      ]);
       setEvents(e.events);
       setMembers(u.users.filter((x) => x.active));
+      setCrewTemplates(c.templates);
     } catch (e) {
       setError(e.message);
     }
@@ -758,6 +775,30 @@ function CalendarView({ lang, session }) {
       return;
     }
     setModal(null);
+  };
+  const applyCrewTemplate = () => {
+    const template = crewTemplates.find((x) => String(x.id) === crewTemplateId);
+    if (!template) return;
+    setDraft({
+      ...draft,
+      crewEntries: template.crewEntries.map((entry) => ({ ...entry })),
+    });
+  };
+  const saveCrewTemplate = async () => {
+    const current = crewTemplates.find((x) => String(x.id) === crewTemplateId);
+    const name = window.prompt(L.crewName, current?.name || "")?.trim();
+    if (!name) return;
+    try {
+      const result = await api("/crew-templates", {
+        method: "POST",
+        body: JSON.stringify({ name, crewEntries: draft.crewEntries }),
+      });
+      const templates = await api("/crew-templates");
+      setCrewTemplates(templates.templates);
+      setCrewTemplateId(String(result.template.id));
+    } catch (e) {
+      setError(e.message);
+    }
   };
   const save = async () => {
     try {
@@ -1042,6 +1083,37 @@ function CalendarView({ lang, session }) {
                     </button>
                   )}
                 </div>
+                {canManage && (
+                  <div className="crewTemplateBar">
+                    <label>
+                      <span>{L.savedCrew}</span>
+                      <select
+                        value={crewTemplateId}
+                        onChange={(e) => setCrewTemplateId(e.target.value)}
+                      >
+                        <option value="">{L.chooseCrew}</option>
+                        {crewTemplates.map((template) => (
+                          <option value={template.id} key={template.id}>
+                            {template.name}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <button
+                      className="crewTemplateButton"
+                      disabled={!crewTemplateId}
+                      onClick={applyCrewTemplate}
+                    >
+                      {L.applyCrew}
+                    </button>
+                    <button
+                      className="crewTemplateButton saveTemplateButton"
+                      onClick={saveCrewTemplate}
+                    >
+                      {L.saveCrew}
+                    </button>
+                  </div>
+                )}
                 <div className="crewHead">
                   <span>{L.pilot}</span>
                   <span>{L.raceClass}</span>
