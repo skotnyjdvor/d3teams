@@ -48,7 +48,6 @@ input {
   padding: 7px 6px;
   clip-path: polygon(8% 0, 100% 0, 92% 100%, 0 100%);
 }
-.logoImage{width:40px;height:40px;object-fit:cover;object-position:center;border:1px solid #2b160d;filter:drop-shadow(0 0 8px rgba(255,90,22,.2))}
 .logo strong {
   display: block;
   font: 800 20px/18px "Barlow Condensed";
@@ -1419,16 +1418,13 @@ header {
   overflow: hidden;
 }
 .loginVisual:after {
-  content: "";
+  content: "03";
   position: absolute;
-  width: min(62vw, 620px);
-  aspect-ratio: 1;
-  right: -5%;
-  bottom: -15%;
-  background: url("/d3teams-logo.png") center/contain no-repeat;
-  opacity: .2;
-  mix-blend-mode: screen;
-  pointer-events: none;
+  right: -20px;
+  bottom: -100px;
+  font: 800 420px/1 "Barlow Condensed";
+  font-style: italic;
+  color: #ffffff05;
 }
 .loginVisual > div:nth-child(2) {
   position: relative;
