@@ -188,6 +188,18 @@ function App() {
       return null;
     }
   });
+  const [dashboard, setDashboard] = useState(null);
+  const [dashboardError, setDashboardError] = useState("");
+  useEffect(() => {
+    if (!session || active !== "overview") return;
+    let current = true;
+    setDashboardError("");
+    fetch(apiUrl("/dashboard"), { headers: { Authorization: `Bearer ${session.token}` } })
+      .then(async r => { const data = await r.json(); if (!r.ok) throw Error(data.error); return data; })
+      .then(data => current && setDashboard(data))
+      .catch(error => current && setDashboardError(error.message));
+    return () => { current = false; };
+  }, [session, active]);
   const t = copy[lang];
   const logout = () => {
     localStorage.removeItem("d3session");
@@ -233,7 +245,7 @@ function App() {
           <div className="teamBadge">{(session.team?.name || "T").slice(0,2).toUpperCase()}</div>
           <div>
             <strong>{session.team?.name || (lang === "PL" ? "Twój zespół" : "Your team")}</strong>
-            <small>{t.team}</small>
+            <small>{t.team}{dashboard?.members != null ? ` · ${dashboard.members} members` : ""}</small>
           </div>
           <ChevronRight size={18} />
         </div>
@@ -316,21 +328,26 @@ function App() {
                 </button>
               </section>
               <section className="metrics">
-                <Metric label={t.next} value="0" suffix={t.days} />
-                <Metric label={t.readiness} value="0" suffix="%" progress={0} />
-                <Metric label={t.openTasks} value="0" suffix="" />
-                <Metric label={t.stockAlerts} value="0" suffix="" />
+                <Metric label={t.next} value={dashboard?.nextEvent?.daysUntil ?? 0} suffix={t.days} accent={!!dashboard?.nextEvent} />
+                <Metric label={t.readiness} value={dashboard?.readiness ?? 0} suffix="%" progress={dashboard?.readiness ?? 0} />
+                <Metric label={t.openTasks} value={dashboard?.tasks?.open ?? 0} suffix={dashboard?.tasks?.critical ? `${dashboard.tasks.critical} CRITICAL` : ""} warn={!!dashboard?.tasks?.critical} />
+                <Metric label={t.stockAlerts} value={dashboard?.inventory?.alerts ?? 0} suffix={dashboard?.inventory?.outOfStock ? `${dashboard.inventory.outOfStock} OUT OF STOCK` : ""} warn={!!dashboard?.inventory?.alerts} />
               </section>
+              {dashboardError && <div className="apiError">{dashboardError}</div>}
               <section className="grid">
                 <div className="column">
                   <Card title={t.nextEvent} action={t.viewCalendar} onAction={() => setActive("calendar")}>
-                    <EmptyOverview icon={CalendarDays} text={lang === "PL" ? "Brak nadchodzących wydarzeń" : "No upcoming events"} />
+                    {dashboard?.nextEvent ? <div className="event">
+                      <div className="dateTile"><b>{new Date(`${dashboard.nextEvent.startDate}T00:00:00`).getDate()}</b><span>{new Date(`${dashboard.nextEvent.startDate}T00:00:00`).toLocaleString(lang === "PL" ? "pl-PL" : "en-GB",{month:"short"}).toUpperCase()}</span></div>
+                      <div className="eventInfo"><span className="live">{dashboard.nextEvent.type}</span><h2>{dashboard.nextEvent.title}</h2><p><MapPin size={15}/>{dashboard.nextEvent.track || dashboard.nextEvent.location}</p><p><CalendarDays size={15}/>{dashboard.nextEvent.startDate} — {dashboard.nextEvent.endDate}</p></div>
+                      <ChevronRight className="eventArrow"/>
+                    </div> : <EmptyOverview icon={CalendarDays} text={lang === "PL" ? "Brak nadchodzących wydarzeń" : "No upcoming events"} />}
                   </Card>
                   <Card title={t.readinessTitle} action={t.viewChecklist} onAction={() => setActive("tasks")}>
-                    <EmptyOverview icon={ClipboardCheck} text={lang === "PL" ? "Brak danych gotowości" : "No readiness data"} />
+                    {dashboard?.nextEvent ? <div className="readiness"><div className="ring" style={{"--p":`${dashboard.readiness}%`}}><div><b>{dashboard.readiness}%</b><span>READY</span></div></div><div className="checks"><Status label={lang === "PL" ? "Zadania wydarzenia" : "Event tasks"} value={`${dashboard.readiness}%`} percent={dashboard.readiness}/></div></div> : <EmptyOverview icon={ClipboardCheck} text={lang === "PL" ? "Brak danych gotowości" : "No readiness data"} />}
                   </Card>
                   <Card title={t.mechanic} action={t.tasks} onAction={() => setActive("tasks")}>
-                    <EmptyOverview icon={ClipboardCheck} text={lang === "PL" ? "Brak zadań mechaników" : "No mechanic tasks"} />
+                    {dashboard?.tasks?.items?.length ? <div className="taskList">{dashboard.tasks.items.map((item,index)=><Task key={index} title={item.title} meta={item.assignee || (lang === "PL" ? "Nieprzypisane" : "Unassigned")} tag={item.priority}/>)}</div> : <EmptyOverview icon={ClipboardCheck} text={lang === "PL" ? "Brak zadań mechaników" : "No mechanic tasks"} />}
                   </Card>
                 </div>
                 <div className="column">
@@ -343,13 +360,13 @@ function App() {
                       <Location
                         icon={Warehouse}
                         name={t.base}
-                        count="0"
+                        count={dashboard?.inventory?.base ?? 0}
                         t={t}
                       />
-                      <Location icon={Truck} name={t.truck} count="0" t={t} />
+                      <Location icon={Truck} name={t.truck} count={dashboard?.inventory?.truck ?? 0} t={t} />
                     </div>
                     <div className="stock">
-                      <EmptyOverview icon={Boxes} text={lang === "PL" ? "Magazyn jest pusty" : "Inventory is empty"} />
+                      {dashboard?.inventory?.lowStock?.length ? dashboard.inventory.lowStock.map((part,index)=><Stock key={index} name={part.name} count={part.count}/>) : <EmptyOverview icon={Boxes} text={lang === "PL" ? "Brak alertów magazynowych" : "No inventory alerts"} />}
                     </div>
                   </Card>
                   <Card title={t.quick}>
@@ -375,7 +392,7 @@ function App() {
                     </div>
                   </Card>
                   <Card title={t.activity} action={t.allActivity} onAction={() => setActive("inventory")}>
-                    <EmptyOverview icon={History} text={lang === "PL" ? "Brak ostatniej aktywności" : "No recent activity"} />
+                    {dashboard?.activity?.length ? <div className="activities">{dashboard.activity.map((item,index)=><Activity key={index} icon={History} text={item.description} time={new Date(item.created_at.replace(" ","T")+"Z").toLocaleDateString(lang === "PL" ? "pl-PL" : "en-GB")}/>)}</div> : <EmptyOverview icon={History} text={lang === "PL" ? "Brak ostatniej aktywności" : "No recent activity"} />}
                   </Card>
                 </div>
               </section>

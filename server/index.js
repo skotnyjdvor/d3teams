@@ -115,5 +115,25 @@ app.delete('/api/parts/:id',auth,roles('owner','manager'),(req,res)=>{const p=db
 app.post('/api/parts/:id/move',auth,roles('owner','manager','mechanic'),(req,res)=>{const p=db.prepare('SELECT * FROM parts WHERE id=? AND team_id=?').get(req.params.id,req.user.teamId);const qty=Math.max(0,+req.body.qty||0),from=req.body.from,to=from==='base'?'truck':'base';if(!p)return res.status(404).json({error:'Part not found'});if(!['base','truck'].includes(from)||!qty||p[`${from}_qty`]<qty)return res.status(400).json({error:'Invalid quantity'});db.prepare(`UPDATE parts SET ${from}_qty=${from}_qty-?,${to}_qty=${to}_qty+?,updated_at=CURRENT_TIMESTAMP WHERE id=?`).run(qty,qty,p.id);log(req.user,p.id,'move',`${qty} × ${p.name} · ${from==='base'?'Base → Truck':'Truck → Base'}`);res.json({part:shape(db.prepare('SELECT * FROM parts WHERE id=?').get(p.id))})});
 app.post('/api/parts/:id/adjust',auth,roles('owner','manager','mechanic'),(req,res)=>{const p=db.prepare('SELECT * FROM parts WHERE id=? AND team_id=?').get(req.params.id,req.user.teamId),loc=req.body.location,delta=+req.body.delta||0;if(!p)return res.status(404).json({error:'Part not found'});if(!['base','truck'].includes(loc)||p[`${loc}_qty`]+delta<0)return res.status(400).json({error:'Invalid adjustment'});db.prepare(`UPDATE parts SET ${loc}_qty=${loc}_qty+?,updated_at=CURRENT_TIMESTAMP WHERE id=?`).run(delta,p.id);log(req.user,p.id,'adjust',`${delta>0?'+':''}${delta} × ${p.name} · ${loc==='base'?'Base':'Truck'}`);res.json({part:shape(db.prepare('SELECT * FROM parts WHERE id=?').get(p.id))})});
 app.get('/api/inventory/logs',auth,(req,res)=>res.json({logs:db.prepare('SELECT description,created_at FROM inventory_logs WHERE team_id=? ORDER BY id DESC LIMIT 10').all(req.user.teamId)}));
+app.get('/api/dashboard',auth,(req,res)=>{
+ const teamId=req.user.teamId,today=new Date().toISOString().slice(0,10);
+ const next=db.prepare("SELECT * FROM events WHERE team_id=? AND status NOT IN ('completed','cancelled') AND end_date>=? ORDER BY start_date LIMIT 1").get(teamId,today);
+ const taskCounts=db.prepare("SELECT count(*) open,sum(CASE WHEN priority='critical' AND status!='done' THEN 1 ELSE 0 END) critical,sum(CASE WHEN status='done' THEN 1 ELSE 0 END) done,count(*) total FROM tasks WHERE team_id=?").get(teamId);
+ const eventTasks=next?db.prepare("SELECT count(*) total,sum(CASE WHEN status='done' THEN 1 ELSE 0 END) done FROM tasks WHERE team_id=? AND event=?").get(teamId,next.title):{total:0,done:0};
+ const inventory=db.prepare("SELECT coalesce(sum(base_qty),0) base,coalesce(sum(truck_qty),0) truck,sum(CASE WHEN base_qty+truck_qty<=min_qty THEN 1 ELSE 0 END) alerts,sum(CASE WHEN base_qty+truck_qty=0 THEN 1 ELSE 0 END) outOfStock FROM parts WHERE team_id=?").get(teamId);
+ const lowStock=db.prepare("SELECT name,base_qty+truck_qty count,unit FROM parts WHERE team_id=? AND base_qty+truck_qty<=min_qty ORDER BY count, name LIMIT 3").all(teamId);
+ const tasks=db.prepare("SELECT t.title,t.priority,t.status,t.due_date,u.name assignee FROM tasks t LEFT JOIN users u ON u.id=t.assignee_id WHERE t.team_id=? AND t.status!='done' ORDER BY CASE t.priority WHEN 'critical' THEN 1 WHEN 'high' THEN 2 WHEN 'medium' THEN 3 ELSE 4 END,t.due_date LIMIT 3").all(teamId);
+ const activity=db.prepare("SELECT description,created_at FROM inventory_logs WHERE team_id=? ORDER BY id DESC LIMIT 3").all(teamId);
+ const members=db.prepare("SELECT count(*) count FROM users WHERE team_id=? AND active=1").get(teamId).count;
+ const daysUntil=next?Math.max(0,Math.ceil((new Date(`${next.start_date}T00:00:00Z`)-new Date(`${today}T00:00:00Z`))/86400000)):0;
+ const readiness=eventTasks.total?Math.round((Number(eventTasks.done||0)/eventTasks.total)*100):0;
+ res.json({
+  nextEvent:next?{id:next.id,title:next.title,type:next.type,startDate:next.start_date,endDate:next.end_date,location:next.location,track:next.track,status:next.status,daysUntil}:null,
+  readiness,
+  tasks:{open:Number(taskCounts.open||0)-Number(taskCounts.done||0),critical:Number(taskCounts.critical||0),items:tasks},
+  inventory:{base:Number(inventory.base||0),truck:Number(inventory.truck||0),alerts:Number(inventory.alerts||0),outOfStock:Number(inventory.outOfStock||0),lowStock},
+  activity,members
+ });
+});
 const port=Number(process.env.PORT)||3001;
 app.listen(port,'0.0.0.0',()=>console.log(`D3Teams API listening on port ${port}`));
