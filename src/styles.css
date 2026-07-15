@@ -1123,6 +1123,12 @@ header {
   background: #222225;
   color: #fff;
 }
+.rowActions button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  background: transparent;
+  border-color: #303034;
+}
 .rowActions button.dangerIcon:hover {
   color: #ff6044;
   border-color: #5b2b23;

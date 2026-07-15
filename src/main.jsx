@@ -2420,6 +2420,7 @@ function InventoryView({ lang, session }) {
           sub: "Kontroluj stany w bazie i ciężarówce.",
           add: "Dodaj część",
           move: "Przenieś",
+          take: "Pobierz część",
           all: "Wszystkie",
           low: "Niski stan",
           out: "Brak",
@@ -2445,6 +2446,9 @@ function InventoryView({ lang, session }) {
           save: "Zapisz",
           moveTitle: "Przenieś zapas",
           adjustTitle: "Korekta stanu",
+          takeTitle: "Pobierz część z magazynu",
+          location: "Lokalizacja",
+          available: "Dostępne",
           from: "Z",
           to: "Do",
           quantity: "Ilość",
@@ -2466,6 +2470,7 @@ function InventoryView({ lang, session }) {
           sub: "Track stock across your Base and Truck.",
           add: "Add part",
           move: "Move stock",
+          take: "Take part",
           all: "All parts",
           low: "Low stock",
           out: "Out of stock",
@@ -2491,6 +2496,9 @@ function InventoryView({ lang, session }) {
           save: "Save",
           moveTitle: "Move stock",
           adjustTitle: "Adjust stock",
+          takeTitle: "Take part from inventory",
+          location: "Location",
+          available: "Available",
           from: "From",
           to: "To",
           quantity: "Quantity",
@@ -2531,6 +2539,7 @@ function InventoryView({ lang, session }) {
     delta: 1,
     reason: "receive",
   });
+  const [take, setTake] = useState({ location: "truck", qty: 1 });
   const [history, setHistory] = useState([]);
   const [apiError, setApiError] = useState("");
   const canManage = ["owner", "manager"].includes(session.user.role);
@@ -2641,6 +2650,18 @@ function InventoryView({ lang, session }) {
           delta: +adjust.delta,
           reason: adjust.reason,
         }),
+      });
+      setModal(null);
+      await refresh();
+    } catch (e) {
+      setApiError(e.message);
+    }
+  };
+  const executeTake = async () => {
+    try {
+      await api(`/parts/${selected.id}/take`, {
+        method: "POST",
+        body: JSON.stringify({ location: take.location, qty: +take.qty }),
       });
       setModal(null);
       await refresh();
@@ -2781,20 +2802,37 @@ function InventoryView({ lang, session }) {
               </span>
               <div className="rowActions">
                 {canStock && (
-                  <button
-                    aria-label={`Adjust ${p.name}`}
-                    onClick={() => {
-                      setSelected(p);
-                      setAdjust({
-                        location: "base",
-                        delta: 1,
-                        reason: "receive",
-                      });
-                      setModal("adjust");
-                    }}
-                  >
-                    <PlusCircle />
-                  </button>
+                  <>
+                    <button
+                      aria-label={`${L.take}: ${p.name}`}
+                      title={L.take}
+                      disabled={p.base + p.truck === 0}
+                      onClick={() => {
+                        setSelected(p);
+                        setTake({
+                          location: p.truck > 0 ? "truck" : "base",
+                          qty: 1,
+                        });
+                        setModal("take");
+                      }}
+                    >
+                      <Wrench />
+                    </button>
+                    <button
+                      aria-label={`Adjust ${p.name}`}
+                      onClick={() => {
+                        setSelected(p);
+                        setAdjust({
+                          location: "base",
+                          delta: 1,
+                          reason: "receive",
+                        });
+                        setModal("adjust");
+                      }}
+                    >
+                      <PlusCircle />
+                    </button>
+                  </>
                 )}
                 {canManage && (
                   <>
@@ -2854,6 +2892,8 @@ function InventoryView({ lang, session }) {
                     : L.addTitle
                   : modal === "move"
                     ? L.moveTitle
+                    : modal === "take"
+                      ? L.takeTitle
                     : modal === "adjust"
                       ? L.adjustTitle
                       : L.deleteTitle}
@@ -3044,6 +3084,44 @@ function InventoryView({ lang, session }) {
                 </div>
               </div>
             )}
+            {modal === "take" && (
+              <div className="form">
+                <label>
+                  {L.part}
+                  <input value={selected?.name || ""} disabled />
+                </label>
+                <div>
+                  <label>
+                    {L.location}
+                    <select
+                      value={take.location}
+                      onChange={(e) =>
+                        setTake({ ...take, location: e.target.value })
+                      }
+                    >
+                      <option value="base">
+                        Base · {L.available}: {selected?.base || 0}
+                      </option>
+                      <option value="truck">
+                        Truck · {L.available}: {selected?.truck || 0}
+                      </option>
+                    </select>
+                  </label>
+                  <label>
+                    {L.quantity}
+                    <input
+                      type="number"
+                      min="1"
+                      max={selected?.[take.location] || 0}
+                      value={take.qty}
+                      onChange={(e) =>
+                        setTake({ ...take, qty: e.target.value })
+                      }
+                    />
+                  </label>
+                </div>
+              </div>
+            )}
             {modal === "delete" && (
               <div className="deleteContent">
                 <span>
@@ -3066,6 +3144,8 @@ function InventoryView({ lang, session }) {
                     ? savePart
                     : modal === "move"
                       ? executeMove
+                      : modal === "take"
+                        ? executeTake
                       : modal === "adjust"
                         ? executeAdjust
                         : confirmDelete
@@ -3075,6 +3155,8 @@ function InventoryView({ lang, session }) {
                   ? L.delete
                   : modal === "move"
                     ? L.move
+                    : modal === "take"
+                      ? L.take
                     : modal === "adjust"
                       ? L.adjust
                       : L.save}
