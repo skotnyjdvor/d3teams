@@ -2492,6 +2492,18 @@ header {
 }
 .eventModal {
   width: min(650px, 100%);
+  max-height: calc(100dvh - 32px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.eventModal .modalHead,
+.eventModal .modalActions {
+  flex: 0 0 auto;
+}
+.eventModal .form {
+  min-height: 0;
+  overflow-y: auto;
 }
 .participantPicker {
   display: grid !important;
@@ -2595,8 +2607,6 @@ header {
     grid-column: 1;
   }
   .eventModal .modalActions {
-    position: sticky;
-    bottom: 0;
     background: #151517;
   }
 }

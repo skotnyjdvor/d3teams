@@ -620,6 +620,8 @@ function CalendarView({ lang, session }) {
           mechanic: "MECHANIK",
           crewTable: "OBSADA WYDARZENIA",
           addCrew: "Dodaj wiersz",
+          discardChanges:
+            "Masz niezapisane zmiany. Czy na pewno chcesz zamknąć bez zapisywania?",
           days: ["Pn", "Wt", "Śr", "Cz", "Pt", "So", "Nd"],
         }
       : {
@@ -662,6 +664,8 @@ function CalendarView({ lang, session }) {
           mechanic: "MECHANIC",
           crewTable: "EVENT CREW",
           addCrew: "Add row",
+          discardChanges:
+            "You have unsaved changes. Are you sure you want to close without saving?",
           days: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
         };
   const blank = {
@@ -685,6 +689,7 @@ function CalendarView({ lang, session }) {
     [modal, setModal] = useState(null),
     [selected, setSelected] = useState(null),
     [draft, setDraft] = useState(blank),
+    [initialDraft, setInitialDraft] = useState(""),
     [error, setError] = useState("");
   const canManage = ["owner", "manager"].includes(session.user.role);
   const api = async (path, options = {}) => {
@@ -714,13 +719,19 @@ function CalendarView({ lang, session }) {
     refresh();
   }, []);
   const openAdd = () => {
+    const nextDraft = {
+      ...blank,
+      crewEntries: blank.crewEntries.map((entry) => ({ ...entry })),
+      participantIds: members.map((x) => x.id),
+    };
     setSelected(null);
-    setDraft({ ...blank, participantIds: members.map((x) => x.id) });
+    setDraft(nextDraft);
+    setInitialDraft(JSON.stringify(nextDraft));
     setModal("edit");
   };
   const openEvent = (e) => {
     setSelected(e);
-    setDraft({
+    const nextDraft = {
       title: e.title,
       type: e.type,
       status: e.status,
@@ -736,8 +747,17 @@ function CalendarView({ lang, session }) {
         ? e.crewEntries
         : [{ pilot: "", raceClass: "OK", days: 1, mechanic: "" }],
       participantIds: e.participantIds,
-    });
+    };
+    setDraft(nextDraft);
+    setInitialDraft(JSON.stringify(nextDraft));
     setModal("edit");
+  };
+  const closeEditor = () => {
+    const hasUnsavedChanges = JSON.stringify(draft) !== initialDraft;
+    if (canManage && hasUnsavedChanges && !window.confirm(L.discardChanges)) {
+      return;
+    }
+    setModal(null);
   };
   const save = async () => {
     try {
@@ -915,14 +935,14 @@ function CalendarView({ lang, session }) {
         </aside>
       </div>
       {modal && (
-        <div className="modalBackdrop" onClick={() => setModal(null)}>
+        <div className="modalBackdrop" onClick={closeEditor}>
           <div
             className="modal eventModal"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="modalHead">
               <h2>{selected ? L.editTitle : L.newTitle}</h2>
-              <button aria-label="Close" onClick={() => setModal(null)}>
+              <button aria-label="Close" onClick={closeEditor}>
                 <X />
               </button>
             </div>
@@ -1215,7 +1235,7 @@ function CalendarView({ lang, session }) {
                   {L.delete}
                 </button>
               )}
-              <button className="secondary" onClick={() => setModal(null)}>
+              <button className="secondary" onClick={closeEditor}>
                 {L.cancel}
               </button>
               {canManage && (
