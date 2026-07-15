@@ -61,7 +61,7 @@ const copy = {
     telemetry: "Telemetry",
     members: "Team members",
     team: "Team",
-    morning: "Good morning, Tony",
+    morning: "Good morning",
     subtitle: "Here’s what needs your attention today.",
     next: "NEXT EVENT",
     days: "DAYS TO GO",
@@ -114,7 +114,7 @@ const copy = {
     telemetry: "Telemetria",
     members: "Członkowie zespołu",
     team: "Zespół",
-    morning: "Dzień dobry, Tony",
+    morning: "Dzień dobry",
     subtitle: "Oto sprawy, które dziś wymagają uwagi.",
     next: "NAJBLIŻSZE ZAWODY",
     days: "DNI DO STARTU",
@@ -331,7 +331,9 @@ function App() {
               <section className="welcome">
                 <div>
                   <p className="eyebrow">D3TEAMS · RACE OPERATIONS</p>
-                  <h1>{t.morning}</h1>
+                  <h1>
+                    {t.morning}, {session.user.name.trim().split(/\s+/)[0]}
+                  </h1>
                   <p>{t.subtitle}</p>
                 </div>
                 <button className="primary" onClick={() => setActive("tasks")}>
